@@ -77,7 +77,6 @@ SELECT									-- Note how despite the query was simplified using the CTE avoidi
 	)
 FROM ordered_categories AS oc2
 ORDER BY manual_rank;
-
 											-- In this case is used just a subquery (and is not necessary a CTE) as the source
 SELECT										-- for the ranking becuase provides the index to rank with ranking function
 	category,								-- abstractions and all the optimizations that they're prone to have like indexed
