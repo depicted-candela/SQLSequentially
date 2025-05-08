@@ -18,7 +18,9 @@
 
 WITH departmental_hiring_sequence AS (
 	SELECT 
-		*,
+		employee_id,
+		department,
+		(first_name || ' ' || last_name) full_name,
 		RANK() OVER(PARTITION BY department ORDER BY hire_date DESC) hiring_rank
 	FROM ranking_functions.employees
 )
@@ -30,12 +32,7 @@ SELECT
 	e1.department top_department,
 	e1.salary top_department, 
 	(e1.salary - avg_salaries.average_salary) AS highest_differential_salaries,
-	current_hiring_sequence.employee_id current_id,
-	next_hiring_sequence.employee_id next_id,
-	current_hiring_sequence.hiring_rank current_rank,
-	next_hiring_sequence.hiring_rank next_rank,
-	current_hiring_sequence.hire_date current_date_,
-	next_hiring_sequence.hire_date next_date_
+	next_hiring_sequence.full_name next_hired
 FROM (
 	SELECT
 		*,
@@ -51,6 +48,8 @@ JOIN (
 JOIN departmental_hiring_sequence AS current_hiring_sequence
 	ON current_hiring_sequence.employee_id = e1.employee_id
 LEFT JOIN departmental_hiring_sequence AS next_hiring_sequence
-	ON current_hiring_sequence.hiring_rank = next_hiring_sequence.hiring_rank - 1
-WHERE current_hiring_sequence.department = next_hiring_sequence.department AND e1.d_rank = 1;
+	ON current_hiring_sequence.department = next_hiring_sequence.department
+	AND current_hiring_sequence.hiring_rank = next_hiring_sequence.hiring_rank - 1
+WHERE e1.d_rank = 1;
+
 
