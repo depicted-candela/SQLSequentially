@@ -29,8 +29,8 @@ WITH departmental_hiring_sequence AS (
 SELECT
 	e1.employee_id id_top_emp,
 	(e1.first_name || ' ' || e1.last_name) top_full_name,
-	e1.department top_department,
-	e1.salary top_department, 
+	e1.department department,
+	e1.salary top_departmental_salary, 
 	(e1.salary - avg_salaries.average_salary) AS highest_differential_salaries,
 	next_hiring_sequence.full_name next_hired
 FROM (
@@ -50,6 +50,5 @@ JOIN departmental_hiring_sequence AS current_hiring_sequence
 LEFT JOIN departmental_hiring_sequence AS next_hiring_sequence
 	ON current_hiring_sequence.department = next_hiring_sequence.department
 	AND current_hiring_sequence.hiring_rank = next_hiring_sequence.hiring_rank - 1
-WHERE e1.d_rank = 1;
-
-
+WHERE e1.d_rank = 1
+ORDER BY department, top_departmental_salary;
