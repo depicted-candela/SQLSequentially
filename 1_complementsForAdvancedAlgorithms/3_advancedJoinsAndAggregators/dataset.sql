@@ -261,4 +261,5 @@ INSERT INTO advanced_joins_aggregators.sales_data (product_id, employee_id, cust
 (2, 8, 'CUST001', '2023-07-05 12:00:00', 1, 790.00, 0.0, 'Europe', 'Credit Card'), -- High perf employee (Hannah), high value
 (3, 9, 'CUST002', '2023-01-17 10:30:00', 1, 25.00, 0.0, 'North America', 'Credit Card'), -- Same customer, different product
 (5, 10, 'CUST003', '2023-02-15 11:00:00', 2, 15.00, 0.0, 'Asia', 'Cash'), -- Same customer
-(7, 9, 'CUST001', '2023-03-08 16:45:00', 3, 70.00, 0.0, 'North America', 'Credit Card'); -- Same customer, high value sale > 200
+(7, 9, 'CUST001', '2023-03-08 16:45:00', 3, 70.00, 0.0, 'North America', 'Credit Card'), -- Same customer, high value sale > 200
+(11, 13, 'CUST009', '2023-08-15 11:00:00', 2, 22.50, 0.0, 'Asia', 'PayPal');

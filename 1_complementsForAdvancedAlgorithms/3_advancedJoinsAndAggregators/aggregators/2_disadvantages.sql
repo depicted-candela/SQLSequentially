@@ -1,27 +1,18 @@
-		-- 2.3 (iii) Practice entirely cases where people in general does not use these approaches losing their advantages, relations
--- and values because of the easier, basic, common or easily understandable but highly inefficient solutions
+		-- 2.2 (ii) Practice entirely their disadvantages of all its technical concepts
 
--- 		Exercise 2.3.1: (COUNT(DISTINCT column) - Inefficient Alternative)
--- Problem: A data analyst needs to find the number of unique products sold. Instead
--- of using COUNT(DISTINCT product id), they first select all distinct product IDs
--- into a subquery and then count the rows from that subquery. Show this less direct
--- (and potentially less optimized by some older DBs) approach.
-
--- SELECT COUNT (*) AS unique_products_sold
--- FROM (												-- Too much verbosity with increased communication cost from the subquery
--- 	SELECT DISTINCT product_id						-- up to the query
--- 	FROM advanced_joins_aggregators.sales_data
--- ) AS distinct_products;
-
--- SELECT COUNT(DISTINCT product_id) AS unique_products_sold FROM advanced_joins_aggregators.sales_data; -- Verbosity reduced
--- 													-- with less communication cost
-
--- 		Exercise 2.3.2: (FILTER clause - Inefficient Alternative: Multiple Queries or Complex CASE)
--- Problem: An analyst needs to count sales: total sales, sales in ’North Amer-
--- ica’, and sales paid by ’PayPal’. Instead of using FILTER, they write three sep-
--- arate queries or use multiple SUM(CASE WHEN ... THEN 1 ELSE 0 END) expres-
--- sions which can be less readable for simple counts. Show the multiple query ap-
--- proach (conceptually) and the SUM(CASE...) approach, then the FILTER clause
--- solution.
-
+-- 		Exercise 2.2.1: (COUNT(DISTINCT column) - Disadvantage)
+-- Problem: Explain a potential performance disadvantage of using COUNT(DISTINCT
+-- column) on a very large table, especially if the column is not well-indexed or has
+-- high cardinality. Why might it be slower than COUNT(*)?
+-- Response:
+-- 		* If the table is not indexed the amount of comparisons to couunt all the different values grows exponentially
+-- 		* If the table is indexed with a high cardinality the condition in the previous option happens again
+-- 
+-- 		Exercise 2.2.2: (FILTER clause - Disadvantage)
+-- Problem: While the FILTER clause is standard SQL, what could be a practical
+-- disadvantage if you are working with an older version of a specific RDBMS that
+-- doesn’t support it, or if you need to write a query that is portable across RDBMS
+-- versions, some of which might not support FILTER? What would be the alternative
+-- in such cases?
+--Response: I would use cases
 
