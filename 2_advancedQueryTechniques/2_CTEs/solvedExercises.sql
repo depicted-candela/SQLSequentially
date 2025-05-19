@@ -1,5 +1,6 @@
 		-- Common Table Expressions - CTEs
 
+
 -- 	1 Category (i): Practice Meanings, Values, Relations, and Advantages
 
 -- These exercises focus on understanding the fundamental meanings, values, and relational
@@ -9,53 +10,53 @@
 -- 		1. Exercise 1: Basic CTE for Readability
 -- Problem: List all employees in the ’Technology’ department who earn more than
 -- $90,000. Show how a CTE can simplify selecting the department first.
--- WITH technologicalEmployees AS (
--- 	SELECT e.* FROM advanced_query_techniques.employeesi e
--- 	NATURAL JOIN advanced_query_techniques.departmentsi di
--- 	WHERE di.departmentName = 'Technology'
--- )
--- SELECT * FROM technologicalEmployees WHERE salary > 90000;
+WITH technologicalEmployees AS (
+	SELECT e.* FROM advanced_query_techniques.employeesi e
+	NATURAL JOIN advanced_query_techniques.departmentsi di
+	WHERE di.departmentName = 'Technology'
+)
+SELECT * FROM technologicalEmployees WHERE salary > 90000;
 
 -- 		2. Exercise 2: CTE Referenced Multiple Times
 -- Problem: Find all employees whose salary is above the average salary of their
 -- respective department. Also, show the department’s average salary. This requires
 -- calculating departmental average salary and then using it for comparison.
--- WITH departmentalAverageSalary AS (
--- 	SELECT e.departmentId, AVG(e.salary) departmentalAvgSalary FROM advanced_query_techniques.employees e
--- 	NATURAL JOIN advanced_query_techniques.departmentsi di
--- 	GROUP BY e.departmentId
--- )
--- SELECT e.* FROM advanced_query_techniques.employeesi e
--- NATURAL JOIN departmentalAverageSalary d
--- WHERE e.salary > d.departmentalAvgSalary;
+WITH departmentalAverageSalary AS (
+	SELECT e.departmentId, AVG(e.salary) departmentalAvgSalary FROM advanced_query_techniques.employees e
+	NATURAL JOIN advanced_query_techniques.departmentsi di
+	GROUP BY e.departmentId
+)
+SELECT e.* FROM advanced_query_techniques.employeesi e
+NATURAL JOIN departmentalAverageSalary d
+WHERE e.salary > d.departmentalAvgSalary;
 
 -- 		3. Exercise 3: Nested CTEs
 -- Problem: List employees from ’New York’ or ’London’ who were hired after 2019.
 -- First, create a CTE for relevant departments. Then, a CTE for employees in those
 -- departments hired after 2019.
--- WITH NYLEmployees AS (
--- 	SELECT e.* FROM advanced_query_techniques.employeesi e
--- 	NATURAL JOIN advanced_query_techniques.departmentsi di
--- 	WHERE di.locationcity IN ('New York', 'London')
--- ), NYLEmployeesHiredAfter2019 AS (
--- 	SELECT * FROM NYLEmployees n WHERE EXTRACT(YEAR FROM n.hireDate) > 2019
--- )
--- SELECT * FROM NYLEmployeesHiredAfter2019;
+WITH NYLEmployees AS (
+	SELECT e.* FROM advanced_query_techniques.employeesi e
+	NATURAL JOIN advanced_query_techniques.departmentsi di
+	WHERE di.locationcity IN ('New York', 'London')
+), NYLEmployeesHiredAfter2019 AS (
+	SELECT * FROM NYLEmployees n WHERE EXTRACT(YEAR FROM n.hireDate) > 2019
+)
+SELECT * FROM NYLEmployeesHiredAfter2019;
 
 -- 		4. Exercise 4: Recursive CTE for Hierarchical Data
 -- Problem: Display the organizational hierarchy for ’Charlie Brown’ (employeeId
 -- 103), showing his reporting line up to the top manager. List employee ID, name,
 -- manager ID, and level in hierarchy.
--- WITH RECURSIVE SingularReportingLine AS (
--- 	SELECT employeeName, employeeId, managerId, 0 AS level 
--- 	FROM advanced_query_techniques.employeesi
--- 	WHERE employeeName = 'Charlie Brown'
--- 	UNION ALL
--- 	SELECT ei.employeeName, ei.employeeId, ei.managerId, srl.level + 1
--- 	FROM advanced_query_techniques.employeesi ei
--- 	JOIN singularreportingline srl ON ei.employeeid = srl.managerId 
--- )
--- SELECT * FROM SingularReportingLine;
+WITH RECURSIVE SingularReportingLine AS (
+	SELECT employeeName, employeeId, managerId, 0 AS level 
+	FROM advanced_query_techniques.employeesi
+	WHERE employeeName = 'Charlie Brown'
+		UNION ALL
+	SELECT ei.employeeName, ei.employeeId, ei.managerId, srl.level + 1
+	FROM advanced_query_techniques.employeesi ei
+	JOIN singularreportingline srl ON ei.employeeid = srl.managerId 
+)
+SELECT * FROM SingularReportingLine;
 
 
 -- 	2 Category (ii): Practice Disadvantages
@@ -71,30 +72,30 @@
 -- tronics’ category. A CTE might calculate revenue for ALL products first, then filter.
 -- (This exercise highlights a *potential* disadvantage; actual performance depends
 -- on the DBMS optimizer).
--- WITH productTotalRevenue AS (
--- 	SELECT st.productId, AVG(p.basePrice * st.quantitySold * (1 - st.discount)) totalRevenue, p.categoryId
--- 	FROM advanced_query_techniques.ProductsII p
--- 	NATURAL JOIN advanced_query_techniques.SalesTransactionsII st		-- This is the more obvious solution
--- 	GROUP BY st.productId, p.categoryId									-- for the given sequential explanation
--- ), electronicProductsTotalRevenue AS (									-- of the problemn, but such sequence
--- 	SELECT p.*, pc.categoryName											-- is not necessarily the best because the
--- 	FROM productTotalRevenue p											-- bigger aggregation (and thus simplifier)
--- 	NATURAL JOIN advanced_query_techniques.ProductCategoriesII pc		-- is the categoryName. Note that all totalRevenues
--- 	WHERE pc.categoryName = 'Electronics'								-- were computed before to be filtered, thus a lot
--- )																	-- of calculations were made with any reason
--- SELECT * FROM electronicProductsTotalRevenue;
--- WITH electronicProducts AS (											-- This order makes the query faster
--- 	SELECT p.*
--- 	FROM advanced_query_techniques.ProductsII p
--- 	NATURAL JOIN advanced_query_techniques.ProductCategoriesII pc
--- 	WHERE pc.categoryName = 'Electronics'
--- ), electronicProductsTotalRevenue AS (
--- 	SELECT st.productId, AVG(p.basePrice * st.quantitySold * (1 - st.discount)) totalRevenue, p.categoryId
--- 	FROM electronicProducts p
--- 	NATURAL JOIN advanced_query_techniques.SalesTransactionsII st
--- 	GROUP BY st.productId, p.categoryId
--- )
--- SELECT productId, totalRevenue FROM electronicProductsTotalRevenue;
+WITH productTotalRevenue AS (
+	SELECT st.productId, AVG(p.basePrice * st.quantitySold * (1 - st.discount)) totalRevenue, p.categoryId
+	FROM advanced_query_techniques.ProductsII p
+	NATURAL JOIN advanced_query_techniques.SalesTransactionsII st		-- This is the more obvious solution
+	GROUP BY st.productId, p.categoryId									-- for the given sequential explanation
+), electronicProductsTotalRevenue AS (									-- of the problemn, but such sequence
+	SELECT p.*, pc.categoryName											-- is not necessarily the best because the
+	FROM productTotalRevenue p											-- bigger aggregation (and thus simplifier)
+	NATURAL JOIN advanced_query_techniques.ProductCategoriesII pc		-- is the categoryName. Note that all totalRevenues
+	WHERE pc.categoryName = 'Electronics'								-- were computed before to be filtered, thus a lot
+)																		-- of calculations were made with any reason
+SELECT * FROM electronicProductsTotalRevenue;
+WITH electronicProducts AS (											-- This order makes the query faster
+	SELECT p.*
+	FROM advanced_query_techniques.ProductsII p
+	NATURAL JOIN advanced_query_techniques.ProductCategoriesII pc
+	WHERE pc.categoryName = 'Electronics'
+), electronicProductsTotalRevenue AS (
+	SELECT st.productId, AVG(p.basePrice * st.quantitySold * (1 - st.discount)) totalRevenue, p.categoryId
+	FROM electronicProducts p
+	NATURAL JOIN advanced_query_techniques.SalesTransactionsII st
+	GROUP BY st.productId, p.categoryId
+)
+SELECT productId, totalRevenue FROM electronicProductsTotalRevenue;
 
 -- 		2. Exercise 2: No Indexing on CTE Results
 -- Problem: Using tables from dataset part II, identify products that had sales in the
@@ -103,17 +104,17 @@
 -- result: first list the product names, then provide a count of these distinct products.
 -- The disadvantage illustrated is that if the CTE result was large and queried multiple
 -- times, it’s re-evaluated or its unindexed materialized result is scanned.
--- WITH interval AS (
--- 	SELECT productId
--- 	FROM advanced_query_techniques.SalesTransactionsII
--- 	WHERE DATE_TRUNC('month', saleDate) = DATE_TRUNC('month', CURRENT_DATE - INTERVAL '1 month')
--- )
--- SELECT p.productName										-- In this scenario is used the same
--- FROM advanced_query_techniques.ProductsII p				-- CTE twice but not meaningfully
--- WHERE p.productId IN (SELECT productID FROM interval)	-- mapping and reducing separately
--- 	UNION ALL												-- data in a scenario of too much 
--- SELECT CONCAT('Totals: ', COUNT(DISTINCT i.productId))	-- information in the tables for products
--- FROM interval i;											-- and sales the query could be too
+WITH interval AS (
+	SELECT productId
+	FROM advanced_query_techniques.SalesTransactionsII
+	WHERE DATE_TRUNC('month', saleDate) = DATE_TRUNC('month', CURRENT_DATE - INTERVAL '1 month')
+)
+SELECT p.productName										-- In this scenario is used the same
+FROM advanced_query_techniques.ProductsII p				-- CTE twice but not meaningfully
+WHERE p.productId IN (SELECT productID FROM interval)	-- mapping and reducing separately
+	UNION ALL												-- data in a scenario of too much 
+SELECT CONCAT('Totals: ', COUNT(DISTINCT i.productId))	-- information in the tables for products
+FROM interval i;											-- and sales the query could be too
 															-- expensive because CTEs are not indexed 
 -- despite with 
 -- WITH interval AS (
@@ -131,20 +132,19 @@
 -- conceptually or by attempting that a CTE defined in one query is not available in
 -- the next, illustrating its scope. Then, demonstrate how you would achieve this by
 -- re-declaring the CTE if needed.
--- WITH BooksTotalRevenue AS (
--- 	SELECT SUM(p.basePrice * s.quantitySold * (1 - s.discount)) total
--- 	FROM advanced_query_techniques.ProductCategoriesII c
--- 	NATURAL JOIN advanced_query_techniques.ProductsII p
--- 	NATURAL JOIN advanced_query_techniques.SalesTransactionsII s
--- 	WHERE c.categoryName = 'Books'
--- )
-
--- SELECT total discount FROM BooksTotalRevenue;				-- These two queries performed
--- SELECT total * 0.1 discount FROM BooksTotalRevenue;			-- not simultaneously in the same 
+WITH BooksTotalRevenue AS (
+	SELECT SUM(p.basePrice * s.quantitySold * (1 - s.discount)) total
+	FROM advanced_query_techniques.ProductCategoriesII c
+	NATURAL JOIN advanced_query_techniques.ProductsII p
+	NATURAL JOIN advanced_query_techniques.SalesTransactionsII s
+	WHERE c.categoryName = 'Books'
+)
+SELECT total discount FROM BooksTotalRevenue;				-- These two queries performed
+SELECT total * 0.1 discount FROM BooksTotalRevenue;			-- not simultaneously in the same 
 															-- query will fail because in the
 															-- second invoking the CTE wont
 															-- exists
--- SELECT total, total * 0.1 discount FROM BooksTotalRevenue;	-- This query is the solution because
+SELECT total, total * 0.1 discount FROM BooksTotalRevenue;	-- This query is the solution because
 															-- uses the same query in the 
 
 
@@ -159,74 +159,74 @@
 -- Problem: Find customers who placed orders in both 2022 and 2023. List their names
 -- and city. Illustrate how CTEs can avoid repeating subquery logic that might scan
 -- ‘OrdersIII‘ multiple times.
--- WITH OrdersIn2022 AS (
--- 	SELECT * 
--- 	FROM advanced_query_techniques.OrdersIII
--- 	WHERE DATE_PART('year', orderDate) = 2022
--- ), OrdersIn2023 AS (
--- 	SELECT * 
--- 	FROM advanced_query_techniques.OrdersIII
--- 	WHERE DATE_PART('year', orderDate) = 2023
--- )
--- SELECT * FROM advanced_query_techniques.CustomersIII c							-- Without the CTEs must be necessary
--- WHERE EXISTS(SELECT 1 FROM OrdersIn2022 o WHERE c.customerId = o.customerId)	-- two subqueries within this creating
--- AND EXISTS(SELECT 1 FROM OrdersIn2023 o WHERE c.customerId = o.customerId)	-- a highly unreadable query
+WITH OrdersIn2022 AS (
+	SELECT * 
+	FROM advanced_query_techniques.OrdersIII
+	WHERE DATE_PART('year', orderDate) = 2022
+), OrdersIn2023 AS (
+	SELECT * 
+	FROM advanced_query_techniques.OrdersIII
+	WHERE DATE_PART('year', orderDate) = 2023
+)
+SELECT * FROM advanced_query_techniques.CustomersIII c							-- Without the CTEs must be necessary
+WHERE EXISTS(SELECT 1 FROM OrdersIn2022 o WHERE c.customerId = o.customerId)	-- two subqueries within this creating
+AND EXISTS(SELECT 1 FROM OrdersIn2023 o WHERE c.customerId = o.customerId);		-- a highly unreadable query
 
 -- 		2. Exercise 2: Simplifying Complex Joins and Filters
 -- Problem: List products (name and category) that were part of orders shipped to
 -- ’North America’ and had a total order value (sum of quantity * pricePerUnit for
 -- all items in that order) greater than $600. Show how CTEs can break down this
 -- logic compared to a single, very long query.
--- WITH USAOrders AS (															-- Note how this CTE is useful to break from
--- 	SELECT *																	-- the beginning the number of necessary mappings
--- 	FROM advanced_query_techniques.OrdersIII									-- in joins by filtering first by shipment region.
--- 	WHERE shipmentRegion = 'North America'										-- Such breaking not only makes more readable the query
--- ), TotalOrderValue AS (														-- but more performant
--- SELECT 
--- 	u.shipmentRegion, 
--- 	p.productName, |
--- 	(o.quantity * o.pricePerUnit) totalOrderValue
--- FROM USAOrders u
--- NATURAL JOIN advanced_query_techniques.OrderItemsIII o
--- NATURAL JOIN advanced_query_techniques.ProductsMasterIII p
--- )
--- SELECT * FROM TotalOrderValue;
+WITH USAOrders AS (															-- Note how this CTE is useful to break from
+	SELECT *																	-- the beginning the number of necessary mappings
+	FROM advanced_query_techniques.OrdersIII									-- in joins by filtering first by shipment region.
+	WHERE shipmentRegion = 'North America'										-- Such breaking not only makes more readable the query
+), TotalOrderValue AS (														-- but more performant
+SELECT 
+	u.shipmentRegion, 
+	p.productName, |
+	(o.quantity * o.pricePerUnit) totalOrderValue
+FROM USAOrders u
+NATURAL JOIN advanced_query_techniques.OrderItemsIII o
+NATURAL JOIN advanced_query_techniques.ProductsMasterIII p
+)
+SELECT * FROM TotalOrderValue;
 
 -- 		3. Exercise 3: Avoiding Temporary Tables for Single-Query Scope
 -- Problem: Calculate the average total order value for each ‘shipmentRegion‘. Then,
 -- list regions whose average order value is greater than the overall average order
 -- value across all regions. Demonstrate how CTEs provide a cleaner, single-statement
 -- solution compared to potentially using temporary tables.
--- WITH RegionizedValue AS (
--- 	SELECT o.shipmentRegion region, AVG(oi.pricePerUnit * oi.quantity) reg_value
--- 	FROM advanced_query_techniques.OrderItemsIII oi
--- 	NATURAL JOIN advanced_query_techniques.OrdersIII o
--- 	GROUP BY o.shipmentRegion
--- )
--- SELECT * 
--- FROM RegionizedValue 
--- WHERE reg_value > (SELECT AVG(reg_value) FROM RegionizedValue);
+WITH RegionizedValue AS (
+	SELECT o.shipmentRegion region, AVG(oi.pricePerUnit * oi.quantity) reg_value
+	FROM advanced_query_techniques.OrderItemsIII oi
+	NATURAL JOIN advanced_query_techniques.OrdersIII o
+	GROUP BY o.shipmentRegion
+)
+SELECT * 
+FROM RegionizedValue 
+WHERE reg_value > (SELECT AVG(reg_value) FROM RegionizedValue);
 	
 -- 		4. Exercise 4: Step-by-Step Multi-Level Aggregations (Revised)
 -- Problem: For each product category, find the month (e.g., ’2023-04’) with the
 -- highest total sales quantity for that category. Display category, the best month,
 -- and total quantity for that month. Solve this using CTEs for structured aggregation,
 -- without using window functions.
--- WITH categoricalMaximumTotalSales AS (
--- 	SELECT p.category, o.orderDate, MAX(oi.quantity) maxQuantity
--- 	FROM advanced_query_techniques.productsMasterIII p
--- 	NATURAL JOIN advanced_query_techniques.ordersIII o
--- 	NATURAL JOIN advanced_query_techniques.orderItemsIII oi
--- 	GROUP BY p.category, o.orderDate
--- )
--- SELECT DISTINCT c1.category, l.*
--- FROM categoricalMaximumTotalSales c1,
--- LATERAL(
--- 	SELECT c2.*
--- 	FROM categoricalMaximumTotalSales c2
--- 	WHERE c1.category = c2.category
--- 	ORDER BY c2.maxQuantity DESC LIMIT 1
--- ) l;
+WITH categoricalMaximumTotalSales AS (
+	SELECT p.category, o.orderDate, MAX(oi.quantity) maxQuantity
+	FROM advanced_query_techniques.productsMasterIII p
+	NATURAL JOIN advanced_query_techniques.ordersIII o
+	NATURAL JOIN advanced_query_techniques.orderItemsIII oi
+	GROUP BY p.category, o.orderDate
+)
+SELECT DISTINCT c1.category, l.*
+FROM categoricalMaximumTotalSales c1,
+LATERAL(
+	SELECT c2.*
+	FROM categoricalMaximumTotalSales c2
+	WHERE c1.category = c2.category
+	ORDER BY c2.maxQuantity DESC LIMIT 1
+) l;
 
 
 -- 	4 Category (iv): Hardcore Combined Problem
