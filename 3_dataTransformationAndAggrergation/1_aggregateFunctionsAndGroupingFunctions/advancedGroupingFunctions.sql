@@ -28,7 +28,7 @@ ORDER BY GROUPING(category, regionName), GROUPING(category), GROUPING(regionName
 -- • Problem: If you define many complex grouping sets, e.g., GROUPING SETS ((a,b,c),
 -- (a,d,e), (b,f), (c,g,h,i), ...), what are the disadvantages in terms of query
 -- complexity and potential for user error in defining the sets?
--- A cube grouping set with too much columns to be observed by a human is un meaningful
+-- Answer: A cube grouping set with too much columns to be observed by a human is un meaningful
 -- but could be useful within a computational process like for graph operations where
 -- is necessary such aggregation despite it could be complex, consuming high memory and computing
 -- there are cases when more power can be used if the information is valuable for a bigger
@@ -80,7 +80,7 @@ GROUP BY ROLLUP(departmentName, projectName);
 -- city), (country, state), (country), and (). What if you also need a subtotal
 -- for (country, city) irrespective of state, or just (city) total? Can ROLLUP do
 -- this directly, and what’s the implication?
--- Because ROLLUP() is a special hierarchized of first degree case of GROUPING_SETS()
+-- Answer: Because ROLLUP() is a special hierarchized of first degree case of GROUPING_SETS()
 -- it will never do anything different that combinations of not adjacent pairs in the
 -- list (country, state, city), thus to get the additional combination (country, city)
 -- you need GROUPING_SETS((country, state, city), (country, city), (country, state), (country), ()) 
