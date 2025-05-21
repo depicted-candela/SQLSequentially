@@ -15,11 +15,11 @@
 -- Concept Focus: jsonb extract path text (or ->> operator) for pulling specific
 -- values from JSON. Advantage: Direct access to nested JSON data without complex
 -- parsing. Relation: WHERE clause for filtering.
--- SELECT 
--- 	logdetails ->> 'userId' userId, 
--- 	logdetails ->> 'clientIp' clientIp
--- FROM data_transformation_and_aggregation.systemlogs 
--- WHERE loglevel = 'INFO';
+SELECT 
+	logdetails ->> 'userId' userId, 
+	logdetails ->> 'clientIp' clientIp
+FROM data_transformation_and_aggregation.systemlogs 
+WHERE loglevel = 'INFO';
 
 -- 		JAF.1.2 Expanding Performance Review Details
 -- Problem: For each employee who has performance reviews, list each review on a
@@ -27,11 +27,11 @@
 -- Concept Focus: jsonb array elements to transform a JSON array within a field
 -- into multiple rows. Advantage: Normalizes JSON array data for relational processing.
 -- Relation: JOIN (implicit with jsonb array elements).
--- SELECT employeeName, review -> 'year' reviewyear, review -> 'rating' rating
--- FROM data_transformation_and_aggregation.employees e, jsonb_array_elements(e.performanceReviews) AS review(performance)
--- WHERE performanceReviews IS NOT NULL 
--- 	AND jsonb_typeof(e.performanceReviews) = 'array' 
--- 	AND jsonb_array_length(e.performanceReviews) <> 0;
+SELECT employeeName, review -> 'year' reviewyear, review -> 'rating' rating
+FROM data_transformation_and_aggregation.employees e, jsonb_array_elements(e.performanceReviews) AS review(performance)
+WHERE performanceReviews IS NOT NULL 
+	AND jsonb_typeof(e.performanceReviews) = 'array' 
+	AND jsonb_array_length(e.performanceReviews) <> 0;
 
 -- 		JAF.1.3 Constructing a Simplified Project Overview JSON
 -- Problem: For each project in ProjectAssignments, create a new JSONB object
@@ -39,13 +39,13 @@
 -- Concept Focus: jsonb build object to create JSON objects dynamically, ARRAY AGG
 -- or jsonb agg (previous concept) to gather employee IDs. Advantage: Creating structured
 -- JSON output from relational data. Relation: GROUP BY for aggregation.
--- SELECT 
--- 	JSONB_BUILD_OBJECT('projectName', projectName, 'employeesId', employeesId) projectedEmployees
--- FROM (
--- 	SELECT projectId, projectName, JSONB_BUILD_OBJECT('employeesIds', JSONB_AGG(employeeId)) employeesId
--- 	FROM data_transformation_and_aggregation.ProjectAssignments
--- 	GROUP BY projectId, projectName
--- ) sq;
+SELECT 
+	JSONB_BUILD_OBJECT('projectName', projectName, 'employeesId', employeesId) projectedEmployees
+FROM (
+	SELECT projectId, projectName, JSONB_BUILD_OBJECT('employeesIds', JSONB_AGG(employeeId)) employeesId
+	FROM data_transformation_and_aggregation.ProjectAssignments
+	GROUP BY projectId, projectName
+) sq;
 
 -- 		JAF.1.4 Updating Event Resources and Checking Count
 -- Problem: For the ’Tech Conference 2024’ event, add ’WiFi Access Point’ to its
@@ -54,14 +54,14 @@
 -- UPDATE and then SELECT).
 -- Concept Focus: array append to add an element to an array, array length to get
 -- the size of an array. Advantage: Simple and efficient array manipulation.
--- SELECT 
--- 	expectedAttendees,
--- 	eventId, eventName, 
--- 	eventCategory, eventStartDate, eventEndDate, 
--- 	array_append(COALESCE(bookedresources, '{}'), 'WiFi Access Point') updatedBookedResources,
--- 	cardinality(array_append(COALESCE(bookedresources, '{}'), 'WiFi Access Point')) totalUpdatedBookedResources
--- FROM data_transformation_and_aggregation.EventCalendar
--- WHERE eventName = 'Tech Conference 2024';
+SELECT 
+	expectedAttendees,
+	eventId, eventName, 
+	eventCategory, eventStartDate, eventEndDate, 
+	array_append(COALESCE(bookedresources, '{}'), 'WiFi Access Point') updatedBookedResources,
+	CARDINALITY(array_append(COALESCE(bookedresources, '{}'), 'WiFi Access Point')) totalUpdatedBookedResources
+FROM data_transformation_and_aggregation.EventCalendar
+WHERE eventName = 'Tech Conference 2024';
 
 
 -- 	2.2 Disadvantages of all its technical concepts
@@ -104,14 +104,14 @@
 -- Highlight the advantages of the JSONB-specific approach.
 -- Concept Focus: Contrasting inefficient string matching on stringified JSON with
 -- efficient JSONB operators.
--- EXPLAIN ANALYZE				-- Inefficient: needs for this case twice as the efficient way
--- SELECT logId, logDetails
--- FROM data_transformation_and_aggregation.SystemLogs
--- WHERE logDetails::TEXT LIKE '%"orderId": 123%';
--- EXPLAIN ANALYZE				-- Efficient
--- SELECT logId, logDetails
--- FROM data_transformation_and_aggregation.SystemLogs
--- WHERE (logDetails ->> 'orderId')::NUMERIC = 123;
+EXPLAIN ANALYZE				-- Inefficient: needs for this case twice as the efficient way
+SELECT logId, logDetails
+FROM data_transformation_and_aggregation.SystemLogs
+WHERE logDetails::TEXT LIKE '%"orderId": 123%';
+EXPLAIN ANALYZE					-- Efficient
+SELECT logId, logDetails
+FROM data_transformation_and_aggregation.SystemLogs
+WHERE (logDetails ->> 'orderId')::NUMERIC = 123;
 
 -- 		JAF.3.2 Storing Multiple Flags as a Comma-Separated String Instead of JSON/Array
 -- Problem: A common inefficient practice is storing multiple boolean flags or cat-
@@ -137,9 +137,9 @@
 --     (3, '{"premium"}', 'premium'),
 --     (4, '{"superpremium", "active"}', 'superpremium,active'),
 --     (5, '{"premium access", "verified"}', 'premium access,verified');
--- SELECT * FROM data_transformation_and_aggregation.Users WHERE userText LIKE '%premium%'; -- INEFFICIENT
--- SELECT * FROM data_transformation_and_aggregation.Users WHERE userTags @> ARRAY['premium']; -- EFFCICIENT
--- SELECT * FROM data_transformation_and_aggregation.Users WHERE 'premium' = ANY(userTags);
+SELECT * FROM data_transformation_and_aggregation.Users WHERE userText LIKE '%premium%'; 	-- INEFFICIENT
+SELECT * FROM data_transformation_and_aggregation.Users WHERE userTags @> ARRAY['premium']; -- EFFICIENT
+SELECT * FROM data_transformation_and_aggregation.Users WHERE 'premium' = ANY(userTags);	-- EFFICIENT
 
 
 -- 	2.4 Hardcore problem combining previous concepts

@@ -6,23 +6,17 @@
 -- and DENSE_RANK(). Specifically, if the requirement is ”employees in the 4th highest
 -- salary tier company-wide”, show how using RANK() = 4 might yield no results, while
 -- DENSE RANK() = 4 would correctly identify them.
-SELECT 
-	first_name,
-	last_name,
-	rank_,
-	dense_rank_
-FROM
-	ranking_functions.employees r1
-JOIN 
-	(
-		SELECT
-			employee_id,
-			RANK() OVER(ORDER BY salary) AS rank_,
-			DENSE_RANK() OVER(ORDER BY salary) AS dense_rank_
-		FROM
-			ranking_functions.employees
-	) AS r2
-ON r1.employee_id = r2.employee_id
+WITH Rankings AS (
+	SELECT
+		employee_id,
+		RANK() OVER(ORDER BY salary) AS rank_,
+		DENSE_RANK() OVER(ORDER BY salary) AS dense_rank_
+	FROM analytical_cons_ranking_functions.employees
+)
+
+SELECT first_name, last_name, rank_, dense_rank_
+FROM analytical_cons_ranking_functions.employees r1
+JOIN Rankings AS r2 ON r1.employee_id = r2.employee_id
 WHERE r2.rank_ = r2.dense_rank_; 	-- Note how just appear the first rank because gaps disalign all the 
 									-- underlying ranks because rank perform its logic with categorical ranking
 									-- that weights a degree of ranking with the same categorical value with
@@ -48,7 +42,7 @@ SELECT * FROM
 			*,
 			ROW_NUMBER() OVER(PARTITION BY department ORDER BY salary DESC, hire_date ASC) row_number_
 		FROM											-- Correct separation of concerns using different ordering
-			ranking_functions.employees					-- ways within the ORDER BY clause making hire_date specifically
+			analytical_cons_ranking_functions.employees					-- ways within the ORDER BY clause making hire_date specifically
 	) AS subquery										-- ascendant
 ORDER BY department, row_number_;
 
@@ -58,7 +52,7 @@ SELECT * FROM
 			*,
 			ROW_NUMBER() OVER(PARTITION BY department ORDER BY salary, hire_date DESC) row_number_
 		FROM
-			ranking_functions.employees					-- Without separations of concerns not using different ordering
+			analytical_cons_ranking_functions.employees					-- Without separations of concerns not using different ordering
 	) AS subquery										-- ways within the ORDER BY clause of the window where it's
 ORDER BY department, row_number_ ASC;					-- possible to separate them to get the expected result.
 														-- Despite changing ASC with DESC in the last ORDER BY statement
@@ -77,7 +71,7 @@ SELECT
 	DENSE_RANK() OVER(ORDER BY salary DESC) tot_salary_ranking,
 	ROW_NUMBER() OVER(ORDER BY first_name, last_name ASC) by_name
 FROM
-	ranking_functions.employees
+	analytical_cons_ranking_functions.employees
 ORDER BY
 	department, dept_salary_ranking, tot_salary_ranking, by_name DESC;
 

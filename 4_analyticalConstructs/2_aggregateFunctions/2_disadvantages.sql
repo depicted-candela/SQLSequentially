@@ -3,12 +3,22 @@
 -- 		Exercise ii.1: Loss of Detail with Average
 -- Problem: Calculate the average salary for the ’Engineering’ department. What specific
 -- salary information is lost when you only look at this average?
-
--- SELECT d.*, avg_s.avg FROM aggregate_functions.departments AS d JOIN (
--- SELECT department_id, AVG(salary) FROM aggregate_functions.employees
--- GROUP BY department_id) AS avg_s				-- 
--- ON d.department_id = avg_s.department_id
--- WHERE d.department_name = 'Engineering';
+SELECT
+	D.*,
+	AVG_S.AVG
+FROM
+	AGGREGATE_FUNCTIONS.DEPARTMENTS AS D
+	JOIN (
+		SELECT
+			DEPARTMENT_ID,
+			AVG(SALARY)
+		FROM
+			AGGREGATE_FUNCTIONS.EMPLOYEES
+		GROUP BY
+			DEPARTMENT_ID
+	) AS AVG_S ON D.DEPARTMENT_ID = AVG_S.DEPARTMENT_ID
+WHERE
+	D.DEPARTMENT_NAME = 'Engineering';
 
 -- 		Exercise ii.2: Misleading Aggregate without GROUP BY
 -- Problem: Consider the query SELECT department id, MAX(salary) FROM employees;.
@@ -24,7 +34,7 @@
 -- handle NULL values in bonus percentage, and how could this be misleading if not un-
 -- derstood?
 
--- SELECT AVG(salary) FROM aggregate_functions.employees; -- Treats NULL as nothing, then skips it, if the the logic
+SELECT AVG(salary) FROM aggregate_functions.employees; -- Treats NULL as nothing, then skips it, if the the logic
 -- of the system stores NULL when is 0, then such skips are problematic because the average is sum()/n where n counts
 -- even when the data is 0
 
@@ -36,10 +46,10 @@
 -- here regarding aggregate function placement?
 
 -- In such cases must be used HAVING
--- SELECT department_id, AVG(performance_rating)
--- FROM aggregate_functions.employees
--- GROUP BY department_id
--- HAVING AVG(performance_rating) < 3.5;
+SELECT department_id, AVG(performance_rating)
+FROM aggregate_functions.employees
+GROUP BY department_id
+HAVING AVG(performance_rating) < 3.5;
 
 
 

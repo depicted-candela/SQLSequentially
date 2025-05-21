@@ -22,7 +22,7 @@ WITH departmental_hiring_sequence AS (
 		department,
 		(first_name || ' ' || last_name) full_name,
 		RANK() OVER(PARTITION BY department ORDER BY hire_date DESC) hiring_rank
-	FROM ranking_functions.employees
+	FROM analytical_cons_ranking_functions.employees
 )
 
 -- 1 & 2 & 3
@@ -38,11 +38,11 @@ FROM (
 		*,
 		RANK() OVER(PARTITION BY department ORDER BY salary DESC) d_rank,
 		RANK() OVER(ORDER BY salary DESC) c_rank
-	FROM ranking_functions.employees
+	FROM analytical_cons_ranking_functions.employees
 ) AS e1
 JOIN (
 	SELECT department, AVG(salary) average_salary
-	FROM ranking_functions.employees GROUP BY department
+	FROM analytical_cons_ranking_functions.employees GROUP BY department
 ) AS avg_salaries
 	ON e1.department = avg_salaries.department
 JOIN departmental_hiring_sequence AS current_hiring_sequence

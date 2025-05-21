@@ -6,12 +6,12 @@
 -- department and joining back) and an efficient solution using ranking functions.
 
 EXPLAIN ANALYZE							-- Verbose and not highly efficient, not only needs to aggregate by
-SELECT e1.*, dept_max_salary				-- department and get the highest value. Also needs to compare with the
-FROM ranking_functions.employees as e1	-- subquery all the departments relating the remaining departments
+SELECT e1.*, dept_max_salary			-- department and get the highest value. Also needs to compare with the
+FROM analytical_cons_ranking_functions.employees as e1	-- subquery all the departments relating the remaining departments
 JOIN 									-- and then again the compare on each department every rows with the
 	(										-- maximum salary aggregated previously
 		SELECT department, MAX(salary) dept_max_salary 
-		FROM ranking_functions.employees 
+		FROM analytical_cons_ranking_functions.employees 
 		GROUP BY department
 	) AS e2
 ON e1.department = e2.department
@@ -20,7 +20,7 @@ WHERE e1.salary = e2.dept_max_salary;
 EXPLAIN ANALYZE
 SELECT * FROM (
 	SELECT *, DENSE_RANK() OVER(PARTITION BY department ORDER BY salary) dept_sal
-	FROM ranking_functions.employees		-- Create a rank partitioning (aggregations) by department and then order
+	FROM analytical_cons_ranking_functions.employees		-- Create a rank partitioning (aggregations) by department and then order
 ) AS subquery								-- by salary. Using such ranking added to the other variables as a
 WHERE subquery.dept_sal = 1;				-- subquery enables the direct usage of it in a parent query needing
 											-- a single comparison one by one to select just department salaries = 1
@@ -32,10 +32,10 @@ WHERE subquery.dept_sal = 1;				-- subquery enables the direct usage of it in a 
 -- An optimized version for massive data sets uses the following indexes for mathematical optimizations,
 -- but since this dataset is small, is not easy to see the difference
 
--- DROP INDEX IF EXISTS ranking_functions.idx_employees_dept_salary;	-- Indexes for optimizations
--- DROP INDEX IF EXISTS ranking_functions.idx_employees_covering;
+-- DROP INDEX IF EXISTS analytical_cons_ranking_functions.idx_employees_dept_salary;	-- Indexes for optimizations
+-- DROP INDEX IF EXISTS analytical_cons_ranking_functions.idx_employees_covering;
 -- CREATE INDEX idx_employees_dept_salary 
--- ON ranking_functions.employees (department, salary DESC);
+-- ON analytical_cons_ranking_functions.employees (department, salary DESC);
 			
 -- 		2. Assign sequential numbers to records
 -- Problem: Provide a unique sequential number for each product sale, ordered by sale date
@@ -46,13 +46,13 @@ SELECT
 	*,
 	(
 		SELECT COUNT(*) + 1													-- X: Highly inefficient (needs too many
-		FROM ranking_functions.product_sales AS ps2							-- comparisons), not easily readable (needs too
+		FROM analytical_cons_ranking_functions.product_sales AS ps2							-- comparisons), not easily readable (needs too
 		WHERE																-- parenthesis controlling logics). The correlated
 			(ps2.sale_date > ps1.sale_date) OR								-- subquery adds too much redundant data
 			(ps2.sale_date = ps1.sale_date AND ps2.sale_id > ps2.sale_id)
 	) manual_rank,
 	ROW_NUMBER() OVER(ORDER BY ps1.sale_date DESC, ps1.sale_id DESC)		-- Ok: Highly efficient and simplified because is
-FROM ranking_functions.product_sales AS ps1									-- based on orders made without redundant data
+FROM analytical_cons_ranking_functions.product_sales AS ps1									-- based on orders made without redundant data
 ORDER BY manual_rank;
 
 -- 		3. Ranking based on an aggregate
@@ -63,7 +63,7 @@ ORDER BY manual_rank;
 
 WITH ordered_categories AS (				-- CTE: For reusability and avoidance of equal subqueries with a single creation
 	SELECT category, SUM(sale_amount) total_sales
-	FROM ranking_functions.product_sales
+	FROM analytical_cons_ranking_functions.product_sales
 	GROUP BY category
 )
 
@@ -84,7 +84,7 @@ SELECT										-- for the ranking becuase provides the index to rank with ranki
 	DENSE_RANK() OVER(ORDER BY total_sales DESC) auto_rank	-- functions ()
 FROM (
 	SELECT category, SUM(sale_amount) total_sales
-	FROM ranking_functions.product_sales
+	FROM analytical_cons_ranking_functions.product_sales
 	GROUP BY category
 ) AS ordered_categories
 ORDER BY auto_rank ASC;

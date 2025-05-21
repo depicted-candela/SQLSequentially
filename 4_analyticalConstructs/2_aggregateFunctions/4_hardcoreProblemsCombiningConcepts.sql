@@ -6,7 +6,6 @@
 -- department (dense rank), the total salary expenditure for their department, and their
 -- salary as a percentage of their department’s total salary. Only include departments with
 -- at least 3 employees. Order results by department name and then by rank.
-
 SELECT
 	(e.first_name || ' ' || e.last_name) fullname,
 	d.department_name, e.salary, dsr.dept_salary_rank,
@@ -35,7 +34,6 @@ ORDER BY d.department_id, dept_salary_rank;
 -- Additionally, rank projects by their budget (highest first). For projects that started in
 -- 2023, also show the running total of budgets for projects started in 2023, ordered by their
 -- start date.
-
 SELECT p.project_name, p.budget, hours.total, hours.average, p.start_date,
 	CASE
 		WHEN EXTRACT(YEAR FROM start_date) = 2023 THEN SUM(budget) OVER(ORDER BY start_date ASC)
@@ -54,7 +52,6 @@ ORDER BY p.budget;
 -- ranks) within their department. Then, filter this list to show only employees who earn
 -- more than their department’s average salary and whose hire date is after ’2020-01-01’.
 -- Order the final result by department name and then by salary in descending order.
-
 SELECT * FROM (
 	SELECT
 		e.first_name || ' ' || e.last_name full_name,
