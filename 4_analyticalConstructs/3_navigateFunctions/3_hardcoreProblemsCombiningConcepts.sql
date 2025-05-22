@@ -140,8 +140,14 @@ WITH EmployeeMonthlyTasked AS (
     FROM
         EmployeeMonthlyPerformance emp
     WHERE
-        emp.tasks_completed > emp.avg_tasks_completed * 1.2 
+        emp.tasks_completed > emp.avg_tasks_completed * 1.2
 )
+
+SELECT 
+	m.employee_id, m.y, m.m, m.totalmonthlytasks, m.previousmonthlytasks, m.nextmonthlytasks, m.mom_task_change_pct,
+	f.department, f.feb_task_rank_in_dept
+FROM MonthlyPercentageChange m
+JOIN FebruaryRanking f USING(employee_id);
 
 -- Point 5
 SELECT
