@@ -13,7 +13,7 @@ This repository is a testament to a passion for SQL and a commitment to structur
 *   🌟 **Authored, Not Just Aggregated:** Every PDF lecture and accompanying exercise set was developed by me, ensuring a cohesive and progressive learning experience.
 *   🧠 **Beyond Syntax – True Understanding:** We dive deep into the "why" behind SQL concepts, not just the "how."
 *   🛠️ **Practical, Hands-On Learning:** Theory is immediately reinforced with custom-designed exercises to solidify your skills.
-*   🐘 **PostgreSQL Focused, Universally Applicable:** While leveraging the power and advanced features of PostgreSQL, the core concepts learned are transferable to any SQL dialect.
+*   🐘 **PostgreSQL Focused but Universally Applicable (Oracle SQL, Server SQL, MySQL):** While leveraging the power and advanced features of PostgreSQL, the core concepts learned are transferable to any SQL dialect.
 *   📈 **From Novice to Pro:** A clear path from `BASIC` SQL fundamentals, through `INTERMEDIATE` techniques, to `ADVANCED` query wizardry and `COMPLEMENTARY` deep-dives.
 *   📊 **Real-World Application:** Includes examples of how to visualize data insights using Metabase, connecting SQL power to business intelligence.
 
