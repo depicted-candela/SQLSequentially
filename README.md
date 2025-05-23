@@ -1,13 +1,11 @@
-[![Ask DeepWiki](https://deepwiki.com/badge.svg)](https://deepwiki.com/depicted-candela/SQLSequentially)
-
 # 🚀 Master Sequential SQL: A Comprehensive, Self-Authored Journey into PostgreSQL 🚀
 
 **Welcome! You've discovered more than just a collection of SQL notes – this is a meticulously crafted, complete learning system I built from the ground up, designed to take you from foundational concepts to advanced PostgreSQL mastery.**
 
 Tired of surface-level tutorials that leave you with more questions than answers? Me too. That's why I didn't just *solve* exercises; I **created the entire curriculum** – from in-depth theoretical lectures to practical, hands-on exercises for every concept. My goal is to foster deep understanding, not just rote memorization.
 
-This repository is a testament to a passion for SQL and a commitment to structured, comprehensive learning.
-
+This repository is a testament to a passion for SQL and a commitment to structured, comprehensive learning
+[![Ask DeepWiki](https://deepwiki.com/badge.svg)](https://deepwiki.com/depicted-candela/SQLSequentially)
 ---
 
 ## ✨ What Makes This SQL Course Unique?
@@ -21,46 +19,49 @@ This repository is a testament to a passion for SQL and a commitment to structur
 
 ---
 
-## 📚 Course Structure: Your Roadmap to SQL Expertise
+### 📚 Course Structure: Your Roadmap to SQL Expertise
 
-This course is sequentially structured to build your knowledge step-by-step. Each module contains detailed PDF lectures (often ending in `_Lecture.pdf` or `_lecture.pdf`) and, where applicable, dedicated exercises.
+This course is sequentially structured to build your knowledge step-by-step. Each module contains detailed PDF lectures and dedicated exercises.
 
-.
-├── 📜 BASIC SQL
-│ ├── Conditionals: WHERE
-│ └── Conditionals: ORDER
-│
-├── 📜 INTERMEDIATE SQL
-│ ├── Aggregators: GROUP, HAVING
-│ ├── Conditionals: DISTINCT
-│ ├── Arithmetic & Math Functions
-│ ├── Date Functions
-│ ├── Casters
-│ ├── Null Space
-│ └── Cases & Joins
-│
-├── 📜 Complementary SQL (Bridging Basic & Intermediate to Advanced)
-│ ├── Advanced WHERE Conditions (Subqueries: IN, EXISTS, ANY, ALL, IS DISTINCT FROM)
-│ ├── Advanced ORDER BY (NULLS FIRST/LAST, Multi-column)
-│ ├── Advanced Joins (CROSS, NATURAL, SELF, USING)
-│ ├── Advanced Aggregators (COUNT(DISTINCT), FILTER)
-│ ├── Advanced Date Functions (Arithmetic, OVERLAPS)
-│ ├── Advanced Cases (Searched, in ORDER BY, in GROUP BY)
-│ ├── Advanced Null Space (NULLIF, Handling in aggregations/sorting)
-│ ├── More Arithmetic, Math, and String Functions
-│ ├── Set Operations (UNION, INTERSECT, EXCEPT)
-│ └── Subqueries (Scalar, Correlated, in FROM, in SELECT)
-│
-└── 📜 ADVANCED SQL (PostgreSQL Focused)
-├── Advanced Query Techniques (FETCH, OFFSET, LATERAL Joins)
-├── Common Table Expressions (CTEs) (Basic, Nested, Recursive)
-├── Data Transformation & Aggregation
-│ ├── Advanced Aggregate Functions (STRING_AGG, ARRAY_AGG, JSON_AGG, etc.)
-│ ├── Advanced Grouping Operations (GROUPING SETS, CUBE, ROLLUP)
-│ ├── Set Returning Functions (generate_series, unnest)
-│ └── JSON and Array Functions (Deep Dive)
-├── Analytical Constructs (Window Functions: OVER(), PARTITION BY, RANK, LEAD, LAG, etc.)
-└── Query Optimization and Performance (Indexing, EXPLAIN Plans, Optimizing Window/Aggregates)
+---
+
+*   **📜 BASIC SQL**
+    *   **Conditionals:** `WHERE`
+    *   **Conditionals:** `ORDER BY`
+
+*   **📜 INTERMEDIATE SQL**
+    *   **Aggregators:** `GROUP BY`, `HAVING`
+    *   **Conditionals:** `DISTINCT`
+    *   **Arithmetic & Math Functions**
+    *   **Date Functions**
+    *   **Casters**
+    *   **Null Space**
+    *   **Cases & Joins**
+
+*   **📜 Complementary SQL** *(Bridging Basic & Intermediate to Advanced)*
+    *   **Advanced `WHERE` Conditions** (Subqueries: `IN`, `EXISTS`, `ANY`, `ALL`, `IS DISTINCT FROM`)
+    *   **Advanced `ORDER BY`** (`NULLS FIRST/LAST`, Multi-column)
+    *   **Advanced Joins** (`CROSS JOIN`, `NATURAL JOIN`, `SELF JOIN`, `USING` clause)
+    *   **Advanced Aggregators** (`COUNT(DISTINCT)`, `FILTER` clause)
+    *   **Advanced Date Functions** (Date arithmetic, `OVERLAPS` operator)
+    *   **Advanced Cases** (Searched `CASE`, `CASE` in `ORDER BY`, `CASE` in `GROUP BY`)
+    *   **Advanced Null Space** (`NULLIF`, Handling in aggregations/sorting)
+    *   **More Arithmetic, Math, and String Functions**
+    *   **Set Operations** (`UNION`, `INTERSECT`, `EXCEPT`)
+    *   **Subqueries** (Scalar, Correlated, in `FROM` clause, in `SELECT` clause)
+
+*   **📜 ADVANCED SQL** *(PostgreSQL Focused)*
+    *   **Advanced Query Techniques** (`FETCH`, `OFFSET`, `LATERAL` Joins)
+    *   **Common Table Expressions (CTEs)** (Basic, Nested, Recursive)
+    *   **Data Transformation & Aggregation**
+        *   **Advanced Aggregate Functions** (`STRING_AGG`, `ARRAY_AGG`, `JSON_AGG`, etc.)
+        *   **Advanced Grouping Operations** (`GROUPING SETS`, `CUBE`, `ROLLUP`)
+        *   **Set Returning Functions** (`generate_series`, `unnest`)
+        *   **JSON and Array Functions** (Deep Dive)
+    *   **Analytical Constructs** (Window Functions: `OVER()`, `PARTITION BY`, `RANK`, `LEAD`, `LAG`, etc.)
+    *   **Query Optimization and Performance** (Indexing, `EXPLAIN` Plans, Optimizing Window/Aggregates)
+
+---
 
 ---
 
