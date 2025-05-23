@@ -136,7 +136,8 @@
 	-- "        Index Cond: (employeeid = ep.employeeid)"
 	-- "Planning Time: 0.625 ms"
 	-- "Execution Time: 16.498 ms"
-	-- Note how the not query without the correlated query is simpler in strategy and faster by properties
+	-- Note how the not query without the correlated query is simpler in strategy and faster by properties despite both can be
+	-- enhanced changing the Nested Loop with a better strategy for joins
 
 
 -- 		2.2.4 Exercise EP-4 (Hardcore Problem - Analyzing and Suggesting Improvements for Complex Query Plan)
@@ -152,18 +153,89 @@
 -- GROUP BY d.departmentId, d.departmentName
 -- HAVING AVG(e.salary) > 75000
 -- ORDER BY avgSalary DESC;
+-- SELECT schemaname, relname AS tablename, indexrelname, idx_scan, idx_tup_read, idx_tup_fetch
+-- FROM pg_stat_user_indexes
+-- WHERE schemaname = 'query_optimizations_and_performance'
+-- ORDER BY idx_scan ASC;
 
 -- 1. Run EXPLAIN (ANALYZE, BUFFERS) on this query.
 -- 2. Identify the most time-consuming operations (nodes with high actual total time).
-		-- Seq Scan on departments d  (cost=0.00..1.10 rows=10 width=222) (actual time=0.017..0.023 rows=10 loops=1)"
-		-- "                          Buffers: shared hit=1"
 -- 3. Check for discrepancies between estimated rows (rows) and actual rows in key filter or join nodes. What might this indicate?
-		-- Big differences, statistics are stale	
 -- 4. Look at Buffers: shared hit=... read=.... What does a high read count suggest for a particular table scan?
-		-- High numbers here must be used to prioritize queries that simplifies subsequent processes or to use most appropriate indexes 
-		-- if aggregations or relations are made
--- 5. Based on the plan, suggest two distinct potential improvements. These could be adding a specific type of index (single/composite), 
--- rewriting part of the query, or an environment tweak (like work_mem if a sort/hash is spilling to disk). Explain why your suggestions 
--- might help.
+-- 5. Based on the plan, suggest two distinct potential improvements. These could be adding a specific type of index 
+-- (single/composite), rewriting part of the query, or an environment tweak (like work_mem if a sort/hash is spilling to disk). 
+-- Explain why your suggestions might help.
+
+-- After a cleaning of all particular indexes made previously for this database for specific problems (where wsuch cleaining was
+-- statistically-based using the query presented in the title Advanced Indexing Features: Supercharging Your Shortcuts of the lecture) 
+-- the following analysis was performed.
+
+-- EXPLAIN (ANALYZE, BUFFERS, FORMAT JSON) SELECT -- 5 - 18ms 
+--  d.departmentName,
+--  COUNT(e.employeeId) as numEngineers,
+--  AVG(e.salary) as avgSalary
+-- FROM query_optimizations_and_performance.Departments d
+-- JOIN query_optimizations_and_performance.Employees e 
+-- 	ON d.departmentId = e.departmentId
+-- WHERE e.jobTitle = 'Software Engineer' AND e.hireDate > '2018-01-01'
+-- GROUP BY d.departmentId, d.departmentName
+-- HAVING AVG(e.salary) > 75000
+-- ORDER BY avgSalary DESC;
+
+-- 2. 	-->  Bitmap Heap Scan on employees e  (cost=200.59..910.96 rows=2481 width=14) (actual time=1.622..7.304 rows=2441 loops=1)
+		-- Bitmap Heap Scan	1	5.711 ms	45.23% requires almost all the compute power of the query
+		-- for WHERE e.jobTitle = 'Software Engineer' AND e.hireDate > '2018-01-01'
+		-- with a shared Buffer hit of 487 meaning 3.8 MB, to high for the query itself
+		-- gets a high cost because needs to filter lots of rows having the highest percentage of buffer of type shared cache activity
+		-- Thus, the most appropriate solution is 
+-- 3. 	-- Not really big differencess between estimated rows and actual rows in most process steps, thus statistics are not highly stale 
+-- 4. 	-- High numbers here must be used to prioritize queries that simplifies subsequent processes or to use most appropriate 
+		-- indexes if aggregations or relations are made
+		--> Bitmap Heap Scan on employees e  (cost=200.59..910.96 rows=2481 width=14) (actual time=1.622..7.304 rows=2441 loops=1)
+-- 5. Query improvements
+
+-- First improvement
+-- CREATE INDEX idx_employees_hiredate_title 			-- Because the order for composed index is: equalities, ranges and then grouping
+-- ON query_optimizations_and_performance.Employees 	-- and orderings:
+-- 	(jobTitle, hireDate, departmentId)				-- equalities -> e.jobTitle = 'Software Engineer'
+-- INCLUDE(salary); 	-- to have salary				-- ranges -> e.hireDate > DATE '2018-01-01' 
+					-- directly related				-- orderings or groupings -> GROUP BY e.departmentId
+-- EXPLAIN (ANALYZE, BUFFERS)
+-- WITH NewEngineers AS (
+-- 	SELECT e.departmentId, AVG(e.salary) avgSalary, COUNT(e.employeeId) numEngineers
+-- 	FROM query_optimizations_and_performance.Employees e
+-- 	WHERE e.jobTitle = 'Software Engineer' AND e.hireDate > DATE '2018-01-01' 
+-- 	GROUP BY e.departmentId
+-- )
+-- SELECT d.departmentId, d.departmentName, e.numEngineers	-- Improves first improvement a little bit but makes a too high
+-- FROM query_optimizations_and_performance.Departments d	-- specialized index
+-- NATURAL JOIN NewEngineers e
+-- WHERE avgSalary > 75000;
+
+-- Second improvement: reduces the percentage
+-- CREATE INDEX idx_employees_departmental_partial
+-- ON query_optimizations_and_performance.Employees
+-- 	(departmentId)
+-- INCLUDE(salary) 	-- to have salary related
+-- WHERE jobTitle = 'Software Engineer'
+-- AND hireDate > '2018-01-01';
+-- EXPLAIN (ANALYZE, BUFFERS, FORMAT JSON)
+-- WITH NewEngineers AS (
+-- 	SELECT e.departmentId, AVG(e.salary) avgSalary, COUNT(e.employeeId) numEngineers
+-- 	FROM query_optimizations_and_performance.Employees e
+-- 	WHERE e.jobTitle = 'Software Engineer' AND e.hireDate > DATE '2018-01-01' 
+-- 	GROUP BY e.departmentId
+-- )
+-- SELECT d.departmentId, d.departmentName, e.numEngineers
+-- FROM query_optimizations_and_performance.Departments d
+-- NATURAL JOIN NewEngineers e
+-- WHERE avgSalary > 75000;
 
 -- Previous Concepts Used: SELECT, FROM, JOIN, WHERE (AND, >), GROUP BY, HAVING, AVG, COUNT, ORDER BY DESC, Date comparisons.
+
+
+
+
+
+
+
