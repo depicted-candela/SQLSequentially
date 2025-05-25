@@ -89,8 +89,3 @@ SELECT
 	-- case like the hiring date that is the factor for the cumularive sum. Other not highly simple and efficient solution
 	-- could be recursion CTE, too complex in comparison with this
 FROM aggregate_functions.employees;
-
-
-
-
-

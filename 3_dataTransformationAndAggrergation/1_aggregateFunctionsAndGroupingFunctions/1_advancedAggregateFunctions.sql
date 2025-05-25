@@ -172,9 +172,9 @@ GROUP BY category;
 -- employee salaries by department to a spreadsheet, then sorts and manually finds
 -- or uses a spreadsheet function for the median for each department. Show how
 -- PERCENTILE_CONT simplifies this.
--- SELECT departmentId, PERCENTILE_CONT(0.5) WITHIN GROUP(ORDER BY salary) medianSalary
--- FROM data_transformation_and_aggregation.employees
--- GROUP BY departmentId;
+SELECT departmentId, PERCENTILE_CONT(0.5) WITHIN GROUP(ORDER BY salary) medianSalary
+FROM data_transformation_and_aggregation.employees
+GROUP BY departmentId;
 
 
 -- 1.5 CORR(Y, X)
@@ -201,8 +201,8 @@ NATURAL JOIN data_transformation_and_aggregation.sales s;
 -- performanceScore, a user exports this data for all employees into a statistical
 -- software package just to compute the Pearson correlation coefficient. Show the
 -- direct SQL method.
--- SELECT CORR(salary, performanceScore) pearsonCorrelation
--- FROM data_transformation_and_aggregation.employees;
+SELECT CORR(salary, performanceScore) pearsonCorrelation
+FROM data_transformation_and_aggregation.employees;
 
 
 -- 1.6 REGR_SLOPE(Y, X)
@@ -242,6 +242,3 @@ FROM data_transformation_and_aggregation.departments d
 JOIN data_transformation_and_aggregation.employees e 
 	ON d.departmentName = 'Sales' AND d.departmentId = e.departmentId;
 -- The salaray does not mean performance score
-
-
-

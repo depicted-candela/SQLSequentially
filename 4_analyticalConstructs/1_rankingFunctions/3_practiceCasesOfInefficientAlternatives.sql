@@ -32,10 +32,10 @@ WHERE subquery.dept_sal = 1;				-- subquery enables the direct usage of it in a 
 -- An optimized version for massive data sets uses the following indexes for mathematical optimizations,
 -- but since this dataset is small, is not easy to see the difference
 
--- DROP INDEX IF EXISTS analytical_cons_ranking_functions.idx_employees_dept_salary;	-- Indexes for optimizations
--- DROP INDEX IF EXISTS analytical_cons_ranking_functions.idx_employees_covering;
--- CREATE INDEX idx_employees_dept_salary 
--- ON analytical_cons_ranking_functions.employees (department, salary DESC);
+DROP INDEX IF EXISTS analytical_cons_ranking_functions.idx_employees_dept_salary;	-- Indexes for optimizations
+DROP INDEX IF EXISTS analytical_cons_ranking_functions.idx_employees_covering;
+CREATE INDEX idx_employees_dept_salary 
+ON analytical_cons_ranking_functions.employees (department, salary DESC);
 			
 -- 		2. Assign sequential numbers to records
 -- Problem: Provide a unique sequential number for each product sale, ordered by sale date

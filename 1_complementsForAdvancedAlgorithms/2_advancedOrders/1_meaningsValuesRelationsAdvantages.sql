@@ -27,6 +27,3 @@ SELECT first_name , last_name , hire_date , bonus_percentage
 FROM employees
 WHERE department = 'Engineering'
 ORDER BY hire_date ASC , bonus_percentage DESC NULLS LAST ;
-
-
-

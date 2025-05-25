@@ -38,18 +38,3 @@ FROM (
 ) more_than_150
 JOIN aggregate_functions.employees e
 ON e.employee_id = more_than_150.employee_id;
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

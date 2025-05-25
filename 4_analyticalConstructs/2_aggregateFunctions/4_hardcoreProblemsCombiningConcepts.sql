@@ -65,9 +65,3 @@ SELECT * FROM (
 	ON e.department_id = d.department_id
 ) AS subquery WHERE subquery.salary > subquery.dept_salary_avg AND subquery.hire_date > '2020-01-01'
 ORDER BY department_name, salary DESC;
-
-
-
-
-
-

@@ -1,3 +1,4 @@
+	-- 5. Set Operations and Subqueries
 		-- 2 Subqueries
 		
 -- 	2.1 Type (i): Meaning, values, relations, advantages
@@ -228,4 +229,3 @@ SELECT
 	) company_budget_percentage
 FROM set_operations_subqueries.departments d
 NATURAL JOIN minimal_department;
-

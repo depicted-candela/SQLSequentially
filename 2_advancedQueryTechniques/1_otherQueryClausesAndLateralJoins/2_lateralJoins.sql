@@ -175,5 +175,3 @@ FROM (
 GROUP BY s1.employeeId, s1.firstName, s1.lastName
 HAVING SUM(l1.complexityScore) > 100
 ORDER BY sumComplexityScore DESC;
-
-

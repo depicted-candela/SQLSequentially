@@ -24,29 +24,29 @@
 	SELECT * 
 	FROM query_optimizations_and_performance.employees 
 	WHERE jobtitle = 'Data Analyst';
-	-- 	QUERY PLAN
-	-- "Bitmap Heap Scan on employees  (cost=59.04..608.54 rows=5000 width=92) (actual time=0.434..1.967 rows=5000 loops=1)"
-	-- "  Recheck Cond: ((jobtitle)::text = 'Data Analyst'::text)"
-	-- "  Heap Blocks: exact=487"
-	-- "  ->  Bitmap Index Scan on idxemployeelastjobtitle  (cost=0.00..57.79 rows=5000 width=0) (actual time=0.328..0.328 rows=5000 loops=1)"
-	-- "        Index Cond: ((jobtitle)::text = 'Data Analyst'::text)"
-	-- "Planning Time: 0.189 ms"
-	-- "Execution Time: 2.318 ms"
-	
-	-- CREATE INDEX idxEmployeeLastJobTitleDataAnalyst  				-- optimized specifically for 'Data Analyst' as jobtitle
-	-- ON query_optimizations_and_performance.employees (jobtitle) 
-	-- WHERE jobtitle = 'Data Analyst';
+-- 	QUERY PLAN
+-- "Bitmap Heap Scan on employees  (cost=59.04..608.54 rows=5000 width=92) (actual time=0.434..1.967 rows=5000 loops=1)"
+-- "  Recheck Cond: ((jobtitle)::text = 'Data Analyst'::text)"
+-- "  Heap Blocks: exact=487"
+-- "  ->  Bitmap Index Scan on idxemployeelastjobtitle  (cost=0.00..57.79 rows=5000 width=0) (actual time=0.328..0.328 rows=5000 loops=1)"
+-- "        Index Cond: ((jobtitle)::text = 'Data Analyst'::text)"
+-- "Planning Time: 0.189 ms"
+-- "Execution Time: 2.318 ms"
+
+-- CREATE INDEX idxEmployeeLastJobTitleDataAnalyst  				-- optimized specifically for 'Data Analyst' as jobtitle
+-- ON query_optimizations_and_performance.employees (jobtitle) 
+-- WHERE jobtitle = 'Data Analyst';
 	EXPLAIN ANALYZE
 	SELECT * 
 	FROM query_optimizations_and_performance.employees 
 	WHERE jobtitle = 'Data Analyst';
-	-- 	QUERY PLAN 
-	-- "Bitmap Heap Scan on employees  (cost=54.53..604.03 rows=5000 width=92) (actual time=0.379..1.505 rows=5000 loops=1)"
-	-- "  Recheck Cond: ((jobtitle)::text = 'Data Analyst'::text)"
-	-- "  Heap Blocks: exact=487"
-	-- "  ->  Bitmap Index Scan on idxemployeelastjobtitledataanalyst  (cost=0.00..53.28 rows=5000 width=0) (actual time=0.277..0.278 rows=5000 loops=1)"
-	-- "Planning Time: 0.116 ms"
-	-- "Execution Time: 1.717 ms"
+-- 	QUERY PLAN 
+-- "Bitmap Heap Scan on employees  (cost=54.53..604.03 rows=5000 width=92) (actual time=0.379..1.505 rows=5000 loops=1)"
+-- "  Recheck Cond: ((jobtitle)::text = 'Data Analyst'::text)"
+-- "  Heap Blocks: exact=487"
+-- "  ->  Bitmap Index Scan on idxemployeelastjobtitledataanalyst  (cost=0.00..53.28 rows=5000 width=0) (actual time=0.277..0.278 rows=5000 loops=1)"
+-- "Planning Time: 0.116 ms"
+-- "Execution Time: 1.717 ms"
 
 -- 		1.2.2 Exercise IS-2 (Disadvantages of Indexes / When B-tree Indexes are Not Optimal)
 -- Problem:
@@ -168,122 +168,122 @@
 		AND performanceScore >= 3.5							-- Here a b-tree for performance scores (partial and/or complete)
 	ORDER BY departmentName, projects DESC, hireDate DESC;	-- Here a b-tree for the tree columns to order
 	
-	-- Joins are efficient.
-	-- The subquery is efficient.
-	-- Selected columns are easily accessible, ideally from an index (covering index).
-	
-	-- Given the schema and the query:
-	-- Automatic Indexes (from PK/UNIQUE constraints in your schema):
-	-- 	departments_pkey ON Departments(departmentId)
-	-- 	departments_departmentname_key ON Departments(departmentName) (Crucial for d.departmentName IN ...)
-	-- 	projects_pkey ON Projects(projectId)
-	-- 	projects_projectname_key ON Projects(projectName)
-	-- 	employees_pkey ON Employees(employeeId)
-	-- 	employees_email_key ON Employees(email)
-	-- 	employeeprojects_pkey ON EmployeeProjects(employeeProjectId)
-	-- 	employeeprojects_employeeid_projectid_key ON EmployeeProjects(employeeId, projectId) (Crucial for the subquery)
-	-- Indexes from the provided setup script:
-	-- 	idxEmployeesLastName ON Employees(lastName) (Not directly used by this query's filters/joins)
-	-- 	idxEmployeesDepartmentId ON Employees(departmentId) (Helpful for the join)
-	-- 	idxEmployeesHireDate ON Employees(hireDate) (Helpful for the hireDate BETWEEN filter)
-	-- The Core Challenge for This Query Lies in the Employees Table Filters:
-	-- 	The query filters Employees by:
-	-- 		e.status = 'Active'
-	-- 		e.hireDate BETWEEN ...
-	-- 		e.performanceScore >= 3.5
-	-- 		And it needs e.departmentId for the join, e.employeeId for the subquery, and e.firstName, e.lastName for the fullName.
-	-- Most Performant and Simplest Effective Set of Additional Indexes:
-	-- 	To make the query most performant, especially considering e.status = 'Active' is likely a very common and selective filter 
-	-- 	(your data generation has ~90% Active), a partial composite covering index on the Employees table is the most impactful single 
-	-- 	addition.
-	-- Primary Recommended Index (New):
-	-- 	This index is designed to cover almost all interactions with the Employees table for rows where status = 'Active'.
+-- Joins are efficient.
+-- The subquery is efficient.
+-- Selected columns are easily accessible, ideally from an index (covering index).
+
+-- Given the schema and the query:
+-- Automatic Indexes (from PK/UNIQUE constraints in your schema):
+-- 	departments_pkey ON Departments(departmentId)
+-- 	departments_departmentname_key ON Departments(departmentName) (Crucial for d.departmentName IN ...)
+-- 	projects_pkey ON Projects(projectId)
+-- 	projects_projectname_key ON Projects(projectName)
+-- 	employees_pkey ON Employees(employeeId)
+-- 	employees_email_key ON Employees(email)
+-- 	employeeprojects_pkey ON EmployeeProjects(employeeProjectId)
+-- 	employeeprojects_employeeid_projectid_key ON EmployeeProjects(employeeId, projectId) (Crucial for the subquery)
+-- Indexes from the provided setup script:
+-- 	idxEmployeesLastName ON Employees(lastName) (Not directly used by this query's filters/joins)
+-- 	idxEmployeesDepartmentId ON Employees(departmentId) (Helpful for the join)
+-- 	idxEmployeesHireDate ON Employees(hireDate) (Helpful for the hireDate BETWEEN filter)
+-- The Core Challenge for This Query Lies in the Employees Table Filters:
+-- 	The query filters Employees by:
+-- 		e.status = 'Active'
+-- 		e.hireDate BETWEEN ...
+-- 		e.performanceScore >= 3.5
+-- 		And it needs e.departmentId for the join, e.employeeId for the subquery, and e.firstName, e.lastName for the fullName.
+-- Most Performant and Simplest Effective Set of Additional Indexes:
+-- 	To make the query most performant, especially considering e.status = 'Active' is likely a very common and selective filter 
+-- 	(your data generation has ~90% Active), a partial composite covering index on the Employees table is the most impactful single 
+-- 	addition.
+-- Primary Recommended Index (New):
+-- 	This index is designed to cover almost all interactions with the Employees table for rows where status = 'Active'.
 	
 	CREATE INDEX idx_employees_active_main_query_covering
 	ON query_optimizations_and_performance.employees (hireDate, performanceScore, departmentId, employeeId, firstName, lastName)
 	WHERE status = 'Active';
 	
-	-- WHERE status = 'Active': Makes the index smaller and highly targeted.
-	-- 	hireDate: First key part for the BETWEEN filter.
-	-- 	performanceScore: Second key part for the >= filter.
-	-- 	departmentId: Included to help the join (can be fetched from the index).
-	-- 	employeeId: Included to provide the ID for the correlated subquery (can be fetched from the index).
-	-- 	firstName, lastName: Included to make this a covering index for the fullName calculation, potentially avoiding a lookup to the main table (heap fetch) for these columns.
+-- WHERE status = 'Active': Makes the index smaller and highly targeted.
+-- 	hireDate: First key part for the BETWEEN filter.
+-- 	performanceScore: Second key part for the >= filter.
+-- 	departmentId: Included to help the join (can be fetched from the index).
+-- 	employeeId: Included to provide the ID for the correlated subquery (can be fetched from the index).
+-- 	firstName, lastName: Included to make this a covering index for the fullName calculation, potentially avoiding a lookup to the main table (heap fetch) for these columns.
+
+-- Summary of ALL Key Indexes for Optimal Performance of THIS Query:
+-- 	This list includes automatically generated indexes crucial for the query and the new highly effective one.
+-- 	SQL to Create/Ensure Key Indexes:
+	-- On Departments table (these are typically created automatically by PK/UNIQUE constraints)
+	CREATE UNIQUE INDEX IF NOT EXISTS departments_pkey ON query_optimizations_and_performance.Departments(departmentId); -- Assuming PK
+	CREATE UNIQUE INDEX IF NOT EXISTS departments_departmentname_key ON query_optimizations_and_performance.Departments(departmentName); -- Assuming UNIQUE
+	-- On EmployeeProjects table (these are typically created automatically by PK/UNIQUE constraints)
+	CREATE UNIQUE INDEX IF NOT EXISTS employeeprojects_pkey ON query_optimizations_and_performance.EmployeeProjects(employeeProjectId); -- Assuming PK
+	CREATE UNIQUE INDEX IF NOT EXISTS employeeprojects_employeeid_projectid_key ON query_optimizations_and_performance.EmployeeProjects(employeeId, projectId); -- Assuming UNIQUE
+	-- On Employees table
+	CREATE UNIQUE INDEX IF NOT EXISTS employees_pkey ON query_optimizations_and_performance.Employees(employeeId); -- Assuming PK
 	
-	-- Summary of ALL Key Indexes for Optimal Performance of THIS Query:
-	-- 	This list includes automatically generated indexes crucial for the query and the new highly effective one.
-	-- 	SQL to Create/Ensure Key Indexes:
-		-- On Departments table (these are typically created automatically by PK/UNIQUE constraints)
-		CREATE UNIQUE INDEX IF NOT EXISTS departments_pkey ON query_optimizations_and_performance.Departments(departmentId); -- Assuming PK
-		CREATE UNIQUE INDEX IF NOT EXISTS departments_departmentname_key ON query_optimizations_and_performance.Departments(departmentName); -- Assuming UNIQUE
-		-- On EmployeeProjects table (these are typically created automatically by PK/UNIQUE constraints)
-		CREATE UNIQUE INDEX IF NOT EXISTS employeeprojects_pkey ON query_optimizations_and_performance.EmployeeProjects(employeeProjectId); -- Assuming PK
-		CREATE UNIQUE INDEX IF NOT EXISTS employeeprojects_employeeid_projectid_key ON query_optimizations_and_performance.EmployeeProjects(employeeId, projectId); -- Assuming UNIQUE
-		-- On Employees table
-		CREATE UNIQUE INDEX IF NOT EXISTS employees_pkey ON query_optimizations_and_performance.Employees(employeeId); -- Assuming PK
+-- The most impactful NEW index for THIS specific query:
+-- CREATE INDEX IF NOT EXISTS idx_employees_active_main_query_covering
+-- ON query_optimizations_and_performance.employees (hireDate, performanceScore, departmentId, employeeId, firstName, lastName)
+-- WHERE status = 'Active';
+
+-- Note: The setup script already adds idxEmployeesDepartmentId and idxEmployeesHireDate.
+-- If idx_employees_active_main_query_covering is created and used,
+-- idxEmployeesDepartmentId and idxEmployeesHireDate might become redundant FOR THIS SPECIFIC QUERY
+-- when status = 'Active', but they could still be useful for other queries or when status is different.
+-- For the "simplest way to make THIS query most performant", the composite index above is the key.
+
+-- Why this set is "simplest effective":
+-- 	It relies heavily on the naturally efficient PK/UNIQUE indexes.
+-- 	It adds one highly targeted and powerful composite index (idx_employees_active_main_query_covering) 
+-- 	that addresses the most complex part of the query's filtering and data retrieval needs on the largest table involved in filtering.
+-- 	The existing employeeprojects_employeeid_projectid_key is perfectly suited for the subquery.
+-- 	The existing departments_departmentname_key is perfectly suited for the IN clause on departments.
+-- 	This approach minimizes the number of new indexes while maximizing the performance gain for the specified query. The pre-existing 
+-- 	idxEmployeesDepartmentId and idxEmployeesHireDate can still serve other queries or this query if the status condition changes.
+
+-- Previous Concepts Used: SELECT, FROM, JOIN (INNER, LEFT), WHERE (AND, OR,
+-- BETWEEN, >=), GROUP BY, COUNT, ORDER BY (multiple columns, DESC), CTEs, Date
+-- Functions.
 	
-	-- The most impactful NEW index for THIS specific query:
-	-- CREATE INDEX IF NOT EXISTS idx_employees_active_main_query_covering
-	-- ON query_optimizations_and_performance.employees (hireDate, performanceScore, departmentId, employeeId, firstName, lastName)
-	-- WHERE status = 'Active';
-	
-	-- Note: The setup script already adds idxEmployeesDepartmentId and idxEmployeesHireDate.
-	-- If idx_employees_active_main_query_covering is created and used,
-	-- idxEmployeesDepartmentId and idxEmployeesHireDate might become redundant FOR THIS SPECIFIC QUERY
-	-- when status = 'Active', but they could still be useful for other queries or when status is different.
-	-- For the "simplest way to make THIS query most performant", the composite index above is the key.
-	
-	-- Why this set is "simplest effective":
-	-- 	It relies heavily on the naturally efficient PK/UNIQUE indexes.
-	-- 	It adds one highly targeted and powerful composite index (idx_employees_active_main_query_covering) 
-	-- 	that addresses the most complex part of the query's filtering and data retrieval needs on the largest table involved in filtering.
-	-- 	The existing employeeprojects_employeeid_projectid_key is perfectly suited for the subquery.
-	-- 	The existing departments_departmentname_key is perfectly suited for the IN clause on departments.
-	-- 	This approach minimizes the number of new indexes while maximizing the performance gain for the specified query. The pre-existing 
-	-- 	idxEmployeesDepartmentId and idxEmployeesHireDate can still serve other queries or this query if the status condition changes.
-	
-	-- Previous Concepts Used: SELECT, FROM, JOIN (INNER, LEFT), WHERE (AND, OR,
-	-- BETWEEN, >=), GROUP BY, COUNT, ORDER BY (multiple columns, DESC), CTEs, Date
-	-- Functions.
-	
-	-- 		1.2.5 Exercise IS-5 (BRIN Indexes for Time-Series Data)
-	-- Problem: The Projects table has grown significantly, and many queries filter projects
-	-- by startDate to focus on recent projects (e.g., started after 2023). Due to the table’s
-	-- size and the sequential nature of startDate, a BRIN index could be more efficient than
-	-- a B-tree.
-	-- 1. Write a query to find all projects with startDate > ’2023-01-01’.
-	-- 2. Run EXPLAIN ANALYZE to observe the current performance and scan type.
-	-- 3. Create a BRIN index on startDate in the Projects table.
-	-- 4. Re-run EXPLAIN ANALYZE on the query. Compare the execution plan and perfor-
-	-- mance. Explain why a BRIN index is advantageous for this scenario, considering
-	-- the sequential nature of startDate.
-		EXPLAIN ANALYZE SELECT * 
-		FROM query_optimizations_and_performance.projects 
-		WHERE startDate > TO_DATE('2023-01-01', 'YYYY-MM-DD');
-		-- "Seq Scan on projects  (cost=0.00..1894.75 rows=10049 width=1433) (actual time=0.030..16.947 rows=10050 loops=1)"
-		-- "  Filter: (startdate > to_date('2023-01-01'::text, 'YYYY-MM-DD'::text))"
-		-- "Planning Time: 0.266 ms"
-		-- "Execution Time: 17.911 ms"
-		CREATE INDEX idxProjectsStartDatePartialBRIN		-- Partial BRIN index over startDate
-		ON query_optimizations_and_performance.projects
-		USING BRIN(startDate) WHERE startDate > DATE '2023-01-01';
-		EXPLAIN ANALYZE SELECT * 
-		FROM query_optimizations_and_performance.projects 
-		WHERE startDate > DATE '2023-01-01';
-		-- "Seq Scan on projects  (cost=0.00..1869.62 rows=10049 width=1433) (actual time=0.013..4.582 rows=10050 loops=1)"
-		-- "  Filter: (startdate > '2023-01-01'::date)"
-		-- "Planning Time: 0.141 ms"
-		-- "Execution Time: 5.330 ms"
-		CREATE INDEX idxProjectsStartDateBRIN			-- Complete BRIN index over startDate
-		ON query_optimizations_and_performance.projects
-		USING BRIN(startDate);
-		EXPLAIN ANALYZE SELECT * 
-		FROM query_optimizations_and_performance.projects 
-		WHERE startDate > DATE '2023-01-01';
-		-- "Seq Scan on projects  (cost=0.00..1869.62 rows=10049 width=1433) (actual time=0.010..3.616 rows=10050 loops=1)"
-		-- "  Filter: (startdate > '2023-01-01'::date)"
-		-- "Planning Time: 0.094 ms"
-		-- "Execution Time: 4.183 ms"
+-- 		1.2.5 Exercise IS-5 (BRIN Indexes for Time-Series Data)
+-- Problem: The Projects table has grown significantly, and many queries filter projects
+-- by startDate to focus on recent projects (e.g., started after 2023). Due to the table’s
+-- size and the sequential nature of startDate, a BRIN index could be more efficient than
+-- a B-tree.
+-- 1. Write a query to find all projects with startDate > ’2023-01-01’.
+-- 2. Run EXPLAIN ANALYZE to observe the current performance and scan type.
+-- 3. Create a BRIN index on startDate in the Projects table.
+-- 4. Re-run EXPLAIN ANALYZE on the query. Compare the execution plan and perfor-
+-- mance. Explain why a BRIN index is advantageous for this scenario, considering
+-- the sequential nature of startDate.
+	EXPLAIN ANALYZE SELECT * 
+	FROM query_optimizations_and_performance.projects 
+	WHERE startDate > TO_DATE('2023-01-01', 'YYYY-MM-DD');
+	-- "Seq Scan on projects  (cost=0.00..1894.75 rows=10049 width=1433) (actual time=0.030..16.947 rows=10050 loops=1)"
+	-- "  Filter: (startdate > to_date('2023-01-01'::text, 'YYYY-MM-DD'::text))"
+	-- "Planning Time: 0.266 ms"
+	-- "Execution Time: 17.911 ms"
+	CREATE INDEX idxProjectsStartDatePartialBRIN		-- Partial BRIN index over startDate
+	ON query_optimizations_and_performance.projects
+	USING BRIN(startDate) WHERE startDate > DATE '2023-01-01';
+	EXPLAIN ANALYZE SELECT * 
+	FROM query_optimizations_and_performance.projects 
+	WHERE startDate > DATE '2023-01-01';
+	-- "Seq Scan on projects  (cost=0.00..1869.62 rows=10049 width=1433) (actual time=0.013..4.582 rows=10050 loops=1)"
+	-- "  Filter: (startdate > '2023-01-01'::date)"
+	-- "Planning Time: 0.141 ms"
+	-- "Execution Time: 5.330 ms"
+	CREATE INDEX idxProjectsStartDateBRIN			-- Complete BRIN index over startDate
+	ON query_optimizations_and_performance.projects
+	USING BRIN(startDate);
+	EXPLAIN ANALYZE SELECT * 
+	FROM query_optimizations_and_performance.projects 
+	WHERE startDate > DATE '2023-01-01';
+	-- "Seq Scan on projects  (cost=0.00..1869.62 rows=10049 width=1433) (actual time=0.010..3.616 rows=10050 loops=1)"
+	-- "  Filter: (startdate > '2023-01-01'::date)"
+	-- "Planning Time: 0.094 ms"
+	-- "Execution Time: 4.183 ms"
 
 -- 		1.2.6 Exercise IS-6 (Hash Indexes and Advanced Options for Equality Lookups)
 -- Problem: The company frequently searches for employees by their exact email address
@@ -323,11 +323,11 @@
 -- 4. Run EXPLAIN ANALYZE to confirm an Index Only Scan is used. Explain how the
 -- stored tsvector and covering index improve performance compared to a regular
 -- GIN index on to tsvector(’english’, projectDescription).
--- ALTER TABLE query_optimizations_and_performance.projects
--- ADD COLUMN described_ts TSVECTOR 
--- GENERATED ALWAYS AS (to_tsvector('english', projectDescription)) STORED;
--- CREATE INDEX idx_describedproject_on_agility_and_release 
--- ON query_optimizations_and_performance.projects
--- USING GIN(described_ts);
+ ALTER TABLE query_optimizations_and_performance.projects
+ ADD COLUMN described_ts TSVECTOR 
+ GENERATED ALWAYS AS (to_tsvector('english', projectDescription)) STORED;
+ CREATE INDEX idx_describedproject_on_agility_and_release 
+ ON query_optimizations_and_performance.projects
+ USING GIN(described_ts);
 SELECT * FROM query_optimizations_and_performance.projects
 WHERE to_tsvector('english', projectDescription) @@ to_tsquery('english', 'agile & release');

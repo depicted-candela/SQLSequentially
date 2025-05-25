@@ -79,6 +79,3 @@ ORDER BY
 -- to obtain orderly the ranking of salary in the company in the order of salary ordered by department.
 -- What's the meaning of it? Because such SQL queries are too complex, rare, and highly focus demanding
 -- is not the case to see mixes different rankings methods using different variables.
-
-
-

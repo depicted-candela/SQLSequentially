@@ -131,12 +131,12 @@ WHERE (logDetails ->> 'orderId')::NUMERIC = 123;
 -- 	   userText TEXT
 -- );
 -- Inserting Data with Array Syntax
--- INSERT INTO data_transformation_and_aggregation.Users (userId, userTags, userText) VALUES
---     (1, '{"active", "premium", "verified"}', 'active,premium,verified'),
---     (2, '{"active", "verified"}', 'active,verified'),
---     (3, '{"premium"}', 'premium'),
---     (4, '{"superpremium", "active"}', 'superpremium,active'),
---     (5, '{"premium access", "verified"}', 'premium access,verified');
+ INSERT INTO data_transformation_and_aggregation.Users (userId, userTags, userText) VALUES
+     (1, '{"active", "premium", "verified"}', 'active,premium,verified'),
+     (2, '{"active", "verified"}', 'active,verified'),
+     (3, '{"premium"}', 'premium'),
+     (4, '{"superpremium", "active"}', 'superpremium,active'),
+     (5, '{"premium access", "verified"}', 'premium access,verified');
 SELECT * FROM data_transformation_and_aggregation.Users WHERE userText LIKE '%premium%'; 	-- INEFFICIENT
 SELECT * FROM data_transformation_and_aggregation.Users WHERE userTags @> ARRAY['premium']; -- EFFICIENT
 SELECT * FROM data_transformation_and_aggregation.Users WHERE 'premium' = ANY(userTags);	-- EFFICIENT

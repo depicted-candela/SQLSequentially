@@ -1,3 +1,4 @@
+	-- 4. Date Functions, Cases, NULL Space 
 		-- 2 Cases (Complementary SQL)
 
 
@@ -11,73 +12,73 @@
 -- ’Completed Early/On-Time’ (actual end date <= planned end date), ’Completed Late’
 -- (actual end date > planned end date). Use a searched CASE expression. Display
 -- project name and its status.
--- SELECT
--- 	STRING_AGG(project_name, ', '),
--- 	CASE
--- 		WHEN start_date > DATE '2024-01-15' THEN 'Upcoming'
--- 		WHEN start_date <= DATE '2024-01-15' THEN 'Ongoing'
--- 		WHEN actual_end_date <= planned_end_date THEN 'Completed Early/On-Time'
--- 		WHEN actual_end_date > planned_end_date THEN 'Completed Late'
--- 	END status
--- FROM advanced_dates_cases_and_null_space.projects
--- GROUP BY
--- 	CASE
--- 		WHEN start_date > DATE '2024-01-15' THEN 'Upcoming'
--- 		WHEN start_date <= DATE '2024-01-15' THEN 'Ongoing'
--- 		WHEN actual_end_date <= planned_end_date THEN 'Completed Early/On-Time'
--- 		WHEN actual_end_date > planned_end_date THEN 'Completed Late'
--- 	END;
+SELECT
+ 	STRING_AGG(project_name, ', '),
+ 	CASE
+ 		WHEN start_date > DATE '2024-01-15' THEN 'Upcoming'
+ 		WHEN start_date <= DATE '2024-01-15' THEN 'Ongoing'
+ 		WHEN actual_end_date <= planned_end_date THEN 'Completed Early/On-Time'
+ 		WHEN actual_end_date > planned_end_date THEN 'Completed Late'
+ 	END status
+FROM advanced_dates_cases_and_null_space.projects
+GROUP BY
+ 	CASE
+ 		WHEN start_date > DATE '2024-01-15' THEN 'Upcoming'
+ 		WHEN start_date <= DATE '2024-01-15' THEN 'Ongoing'
+ 		WHEN actual_end_date <= planned_end_date THEN 'Completed Early/On-Time'
+ 		WHEN actual_end_date > planned_end_date THEN 'Completed Late'
+	END;
 	
 -- 		Exercise 2.2: Sorting Employees by Custom Priority
 -- Problem: List all employees. Sort them by: first, managers (those who are manager id
 -- for someone or have no manager id themselves), then non-managers. Within managers,
 -- sort by salary descending. Within non-managers, sort by hire date ascending. Use CASE
 -- in ORDER BY.
--- SELECT
---     *,
--- 	CASE 
---         WHEN EXISTS(
--- 			SELECT * FROM advanced_dates_cases_and_null_space.projects p WHERE p.lead_emp_id = e.emp_id
--- 		) OR e.manager_id IS NOT NULL THEN 'Manager'
---         ELSE 'Not Manager'
---     END status
--- FROM advanced_dates_cases_and_null_space.employees e
--- ORDER BY 
---     CASE 
---         WHEN EXISTS(
--- 			SELECT * FROM advanced_dates_cases_and_null_space.projects p WHERE p.lead_emp_id = e.emp_id
--- 		) OR e.manager_id IS NOT NULL THEN 0
---         ELSE 1
---     END ASC,
--- 	CASE 
---         WHEN EXISTS(
--- 			SELECT * FROM advanced_dates_cases_and_null_space.projects p WHERE p.lead_emp_id = e.emp_id
--- 		) OR e.manager_id IS NOT NULL THEN salary
---         ELSE NULL									-- skips orders when the cased when does not match
---     END DESC,										-- the subquery of managers
--- 	CASE 
---         WHEN e.manager_id <> ALL(
--- 			SELECT p.lead_emp_id FROM advanced_dates_cases_and_null_space.projects p
--- 		) OR e.manager_id IS NULL THEN hire_date
---         ELSE NULL									-- skips orders when the cased when does not match
---     END ASC;										-- the subquery for not managers
+SELECT
+     *,
+ 	CASE 
+         WHEN EXISTS(
+ 			SELECT * FROM advanced_dates_cases_and_null_space.projects p WHERE p.lead_emp_id = e.emp_id
+ 		) OR e.manager_id IS NOT NULL THEN 'Manager'
+         ELSE 'Not Manager'
+     END status
+ FROM advanced_dates_cases_and_null_space.employees e
+ ORDER BY 
+     CASE 
+         WHEN EXISTS(
+ 			SELECT * FROM advanced_dates_cases_and_null_space.projects p WHERE p.lead_emp_id = e.emp_id
+ 		) OR e.manager_id IS NOT NULL THEN 0
+         ELSE 1
+     END ASC,
+ 	CASE 
+         WHEN EXISTS(
+ 			SELECT * FROM advanced_dates_cases_and_null_space.projects p WHERE p.lead_emp_id = e.emp_id
+ 		) OR e.manager_id IS NOT NULL THEN salary
+         ELSE NULL									-- skips orders when the cased when does not match
+     END DESC,										-- the subquery of managers
+ 	CASE 
+         WHEN e.manager_id <> ALL(
+ 			SELECT p.lead_emp_id FROM advanced_dates_cases_and_null_space.projects p
+ 		) OR e.manager_id IS NULL THEN hire_date
+         ELSE NULL									-- skips orders when the cased when does not match
+     END ASC;										-- the subquery for not managers
 
 -- 		Exercise 2.3: Grouping Projects by Budget Ranges
 -- Problem: Group projects by budget: ’Low’ (<= 50000), ’Medium’ (50001 - 150000),
 -- ’High’ (> 150000), ’Undefined’ (budget IS NULL). Count projects and sum their budgets
 -- in each category. Use CASE in GROUP BY.
--- SELECT
--- 	STRING_AGG(project_name, ', '),
--- 	SUM(budget) total_budget,
--- 	CASE
--- 		WHEN budget <= 50000 THEN 'Low'
--- 		WHEN budget BETWEEN 50000 AND 150000 THEN 'High'
--- 		WHEN budget > 150000 THEN 'High'
--- 		WHEN budget IS NULL THEN 'Undefined' 
--- 	END AS financial_project
--- FROM advanced_dates_cases_and_null_space.projects
--- GROUP BY
--- 	financial_project;
+ SELECT
+ 	STRING_AGG(project_name, ', '),
+ 	SUM(budget) total_budget,
+ 	CASE
+ 		WHEN budget <= 50000 THEN 'Low'
+ 		WHEN budget BETWEEN 50000 AND 150000 THEN 'High'
+ 		WHEN budget > 150000 THEN 'High'
+ 		WHEN budget IS NULL THEN 'Undefined' 
+ 	END AS financial_project
+ FROM advanced_dates_cases_and_null_space.projects
+ GROUP BY
+ 	financial_project;
 
 
 -- 	(ii) Disadvantages of all its technical concepts
@@ -88,10 +89,10 @@
 -- If also rating 5, append ”, Top Performer”. Otherwise, profile is ”Standard”. Construct
 -- this query and discuss the readability impact of such deeply nested or numerous WHEN
 -- conditions.
--- SELECT
--- 	emp_id, emp_name,
--- 	CASE													-- Too complex to be easily readed
--- 		WHEN salary > 100000 THEN 'High Earner' ||			-- because the nested logic grows exponentially
+ SELECT
+ 	emp_id, emp_name,
+ 	CASE													-- Too complex to be easily readed
+ 		WHEN salary > 100000 THEN 'High Earner' ||			-- because the nested logic grows exponentially
 -- 			CASE 											-- in the number of necessary commands
 -- 				WHEN dept_id = 2 THEN ', Key Engineer' ||
 -- 					CASE

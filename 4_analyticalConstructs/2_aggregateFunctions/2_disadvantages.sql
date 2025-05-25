@@ -50,6 +50,3 @@ SELECT department_id, AVG(performance_rating)
 FROM aggregate_functions.employees
 GROUP BY department_id
 HAVING AVG(performance_rating) < 3.5;
-
-
-

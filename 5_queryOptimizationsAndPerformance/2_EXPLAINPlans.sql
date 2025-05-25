@@ -71,24 +71,24 @@
 -- 3. Rewrite using a LEFT JOIN to EmployeeProjects and Projects.
 -- 4. Run EXPLAIN ANALYZE on the JOIN version. Compare plan (e.g., join types, scan costs) and total actual execution time. 
 -- Why is the JOIN generally better?
-	-- EXPLAIN ANALYZE
-	-- SELECT
-	--     e.employeeId,
-	--     e.firstName,
-	--     e.lastName,
-	--     (SELECT p.projectName
-	--      FROM query_optimizations_and_performance.Projects p
-	--      JOIN query_optimizations_and_performance.EmployeeProjects epFind ON p.projectId = epFind.projectId
-	--      WHERE epFind.employeeId = e.employeeId AND p.projectName = 'Project Alpha 1'
-	--      LIMIT 1) AS projectAlphaName
-	-- FROM
-	--     query_optimizations_and_performance.Employees e
-	-- WHERE EXISTS (
-	--     SELECT 1
-	--     FROM query_optimizations_and_performance.EmployeeProjects epChk
-	--     JOIN query_optimizations_and_performance.Projects pChk ON epChk.projectId = pChk.projectId
-	--     WHERE epChk.employeeId = e.employeeId AND pChk.projectName = 'Project Alpha 1'
-	-- );
+	 EXPLAIN ANALYZE
+	 SELECT
+	     e.employeeId,
+	     e.firstName,
+	     e.lastName,
+	     (SELECT p.projectName
+	      FROM query_optimizations_and_performance.Projects p
+	      JOIN query_optimizations_and_performance.EmployeeProjects epFind ON p.projectId = epFind.projectId
+	      WHERE epFind.employeeId = e.employeeId AND p.projectName = 'Project Alpha 1'
+	      LIMIT 1) AS projectAlphaName
+	 FROM
+	     query_optimizations_and_performance.Employees e
+	 WHERE EXISTS (
+	     SELECT 1
+	     FROM query_optimizations_and_performance.EmployeeProjects epChk
+	     JOIN query_optimizations_and_performance.Projects pChk ON epChk.projectId = pChk.projectId
+	     WHERE epChk.employeeId = e.employeeId AND pChk.projectName = 'Project Alpha 1'
+	 );
 	-- "Nested Loop  (cost=1718.98..1836.37 rows=9 width=348) (actual time=24.115..24.119 rows=0 loops=1)"
 	-- "  ->  HashAggregate  (cost=1718.69..1718.78 rows=9 width=4) (actual time=24.114..24.117 rows=0 loops=1)"
 	-- "        Group Key: epchk.employeeid"
@@ -114,16 +114,16 @@
 	-- "Planning Time: 2.267 ms"
 	-- "Execution Time: 24.176 ms"
 
-	-- EXPLAIN ANALYZE
-	-- SELECT
-	--     e.employeeId,
-	--     e.firstName,
-	--     e.lastName,
-	--     p.projectName
-	-- FROM query_optimizations_and_performance.Employees e
-	-- JOIN query_optimizations_and_performance.EmployeeProjects ep ON e.employeeId = ep.employeeId
-	-- JOIN query_optimizations_and_performance.Projects p ON ep.projectId = p.projectId
-	-- WHERE p.projectName = 'Project Alpha 1';
+	 EXPLAIN ANALYZE
+	 SELECT
+	     e.employeeId,
+	     e.firstName,
+	     e.lastName,
+	     p.projectName
+	 FROM query_optimizations_and_performance.Employees e
+	 JOIN query_optimizations_and_performance.EmployeeProjects ep ON e.employeeId = ep.employeeId
+	 JOIN query_optimizations_and_performance.Projects p ON ep.projectId = p.projectId
+	 WHERE p.projectName = 'Project Alpha 1';
 	-- "Nested Loop  (cost=8.60..1721.64 rows=9 width=48) (actual time=16.457..16.460 rows=0 loops=1)"
 	-- "  ->  Hash Join  (cost=8.31..1718.67 rows=9 width=22) (actual time=16.456..16.458 rows=0 loops=1)"
 	-- "        Hash Cond: (ep.projectid = p.projectid)"
@@ -143,20 +143,20 @@
 -- 		2.2.4 Exercise EP-4 (Hardcore Problem - Analyzing and Suggesting Improvements for Complex Query Plan)
 -- Problem: A query is written to find departments where the average salary of ’Software Engineer’ employees hired after Jan 1, 
 -- 2018, exceeds $75,000. The query also lists the count of such engineers in those departments.
--- EXPLAIN (ANALYZE, BUFFERS) SELECT
---  d.departmentName,
---  COUNT(e.employeeId) as numEngineers,
---  AVG(e.salary) as avgSalary
--- FROM query_optimizations_and_performance.Departments d
--- JOIN query_optimizations_and_performance.Employees e ON d.departmentId = e.departmentId
--- WHERE e.jobTitle = 'Software Engineer' AND e.hireDate > '2018-01-01'
--- GROUP BY d.departmentId, d.departmentName
--- HAVING AVG(e.salary) > 75000
--- ORDER BY avgSalary DESC;
--- SELECT schemaname, relname AS tablename, indexrelname, idx_scan, idx_tup_read, idx_tup_fetch
--- FROM pg_stat_user_indexes
--- WHERE schemaname = 'query_optimizations_and_performance'
--- ORDER BY idx_scan ASC;
+	 EXPLAIN (ANALYZE, BUFFERS) SELECT
+	  d.departmentName,
+	  COUNT(e.employeeId) as numEngineers,
+	  AVG(e.salary) as avgSalary
+	 FROM query_optimizations_and_performance.Departments d
+	 JOIN query_optimizations_and_performance.Employees e ON d.departmentId = e.departmentId
+	 WHERE e.jobTitle = 'Software Engineer' AND e.hireDate > '2018-01-01'
+	 GROUP BY d.departmentId, d.departmentName
+	 HAVING AVG(e.salary) > 75000
+	 ORDER BY avgSalary DESC;
+	 SELECT schemaname, relname AS tablename, indexrelname, idx_scan, idx_tup_read, idx_tup_fetch
+	 FROM pg_stat_user_indexes
+	 WHERE schemaname = 'query_optimizations_and_performance'
+	 ORDER BY idx_scan ASC;
 
 -- 1. Run EXPLAIN (ANALYZE, BUFFERS) on this query.
 -- 2. Identify the most time-consuming operations (nodes with high actual total time).
@@ -170,17 +170,17 @@
 -- statistically-based using the query presented in the title Advanced Indexing Features: Supercharging Your Shortcuts of the lecture) 
 -- the following analysis was performed.
 
--- EXPLAIN (ANALYZE, BUFFERS, FORMAT JSON) SELECT -- 5 - 18ms 
---  d.departmentName,
---  COUNT(e.employeeId) as numEngineers,
---  AVG(e.salary) as avgSalary
--- FROM query_optimizations_and_performance.Departments d
--- JOIN query_optimizations_and_performance.Employees e 
--- 	ON d.departmentId = e.departmentId
--- WHERE e.jobTitle = 'Software Engineer' AND e.hireDate > '2018-01-01'
--- GROUP BY d.departmentId, d.departmentName
--- HAVING AVG(e.salary) > 75000
--- ORDER BY avgSalary DESC;
+ EXPLAIN (ANALYZE, BUFFERS, FORMAT JSON) SELECT -- 5 - 18ms 
+  d.departmentName,
+  COUNT(e.employeeId) as numEngineers,
+  AVG(e.salary) as avgSalary
+ FROM query_optimizations_and_performance.Departments d
+ JOIN query_optimizations_and_performance.Employees e 
+ 	ON d.departmentId = e.departmentId
+ WHERE e.jobTitle = 'Software Engineer' AND e.hireDate > '2018-01-01'
+ GROUP BY d.departmentId, d.departmentName
+ HAVING AVG(e.salary) > 75000
+ ORDER BY avgSalary DESC;
 
 -- 2. 	-->  Bitmap Heap Scan on employees e  (cost=200.59..910.96 rows=2481 width=14) (actual time=1.622..7.304 rows=2441 loops=1)
 		-- Bitmap Heap Scan	1	5.711 ms	45.23% requires almost all the compute power of the query
@@ -196,46 +196,39 @@
 
 -- First improvement
 -- CREATE INDEX idx_employees_hiredate_title 			-- Because the order for composed index is: equalities, ranges and then grouping
--- ON query_optimizations_and_performance.Employees 	-- and orderings:
--- 	(jobTitle, hireDate, departmentId)				-- equalities -> e.jobTitle = 'Software Engineer'
--- INCLUDE(salary); 	-- to have salary				-- ranges -> e.hireDate > DATE '2018-01-01' 
+ ON query_optimizations_and_performance.Employees 	-- and orderings:
+ 	(jobTitle, hireDate, departmentId)				-- equalities -> e.jobTitle = 'Software Engineer'
+ INCLUDE(salary); 	-- to have salary				-- ranges -> e.hireDate > DATE '2018-01-01' 
 					-- directly related				-- orderings or groupings -> GROUP BY e.departmentId
--- EXPLAIN (ANALYZE, BUFFERS)
--- WITH NewEngineers AS (
--- 	SELECT e.departmentId, AVG(e.salary) avgSalary, COUNT(e.employeeId) numEngineers
--- 	FROM query_optimizations_and_performance.Employees e
--- 	WHERE e.jobTitle = 'Software Engineer' AND e.hireDate > DATE '2018-01-01' 
--- 	GROUP BY e.departmentId
--- )
--- SELECT d.departmentId, d.departmentName, e.numEngineers	-- Improves first improvement a little bit but makes a too high
--- FROM query_optimizations_and_performance.Departments d	-- specialized index
--- NATURAL JOIN NewEngineers e
--- WHERE avgSalary > 75000;
+ EXPLAIN (ANALYZE, BUFFERS)
+ WITH NewEngineers AS (
+ 	SELECT e.departmentId, AVG(e.salary) avgSalary, COUNT(e.employeeId) numEngineers
+ 	FROM query_optimizations_and_performance.Employees e
+	WHERE e.jobTitle = 'Software Engineer' AND e.hireDate > DATE '2018-01-01' 
+	GROUP BY e.departmentId
+)
+SELECT d.departmentId, d.departmentName, e.numEngineers	-- Improves first improvement a little bit but makes a too high
+FROM query_optimizations_and_performance.Departments d	-- specialized index
+NATURAL JOIN NewEngineers e
+WHERE avgSalary > 75000;
 
 -- Second improvement: reduces the percentage
--- CREATE INDEX idx_employees_departmental_partial
--- ON query_optimizations_and_performance.Employees
--- 	(departmentId)
--- INCLUDE(salary) 	-- to have salary related
--- WHERE jobTitle = 'Software Engineer'
--- AND hireDate > '2018-01-01';
--- EXPLAIN (ANALYZE, BUFFERS, FORMAT JSON)
--- WITH NewEngineers AS (
--- 	SELECT e.departmentId, AVG(e.salary) avgSalary, COUNT(e.employeeId) numEngineers
--- 	FROM query_optimizations_and_performance.Employees e
--- 	WHERE e.jobTitle = 'Software Engineer' AND e.hireDate > DATE '2018-01-01' 
--- 	GROUP BY e.departmentId
--- )
--- SELECT d.departmentId, d.departmentName, e.numEngineers
--- FROM query_optimizations_and_performance.Departments d
--- NATURAL JOIN NewEngineers e
--- WHERE avgSalary > 75000;
+CREATE INDEX idx_employees_departmental_partial
+ON query_optimizations_and_performance.Employees
+	(departmentId)
+INCLUDE(salary) 	-- to have salary related
+WHERE jobTitle = 'Software Engineer'
+AND hireDate > '2018-01-01';
+EXPLAIN (ANALYZE, BUFFERS, FORMAT JSON)
+WITH NewEngineers AS (
+	SELECT e.departmentId, AVG(e.salary) avgSalary, COUNT(e.employeeId) numEngineers
+	FROM query_optimizations_and_performance.Employees e
+	WHERE e.jobTitle = 'Software Engineer' AND e.hireDate > DATE '2018-01-01' 
+	GROUP BY e.departmentId
+)
+SELECT d.departmentId, d.departmentName, e.numEngineers
+FROM query_optimizations_and_performance.Departments d
+NATURAL JOIN NewEngineers e
+WHERE avgSalary > 75000;
 
 -- Previous Concepts Used: SELECT, FROM, JOIN, WHERE (AND, >), GROUP BY, HAVING, AVG, COUNT, ORDER BY DESC, Date comparisons.
-
-
-
-
-
-
-

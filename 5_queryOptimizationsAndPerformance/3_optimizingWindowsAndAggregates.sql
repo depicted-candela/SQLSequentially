@@ -128,20 +128,3 @@ JOIN RegionalizedSalesOf2022 r USING (regionId)
 JOIN CategorizedSalesOf2022 c USING (category)
 WHERE s.totalAmount > 1000
 ORDER BY regionalizedCategoricalSales;
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

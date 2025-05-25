@@ -1,3 +1,4 @@
+	-- 5. Set Operations and Subqueries
 		-- 1 Set Operations
 		
 -- 	1.1 Type (i): Meaning, values, relations, advantages
@@ -174,12 +175,3 @@ EXCEPT (
 	FROM set_operations_subqueries.on_leave_employees 
 	NATURAL JOIN set_operations_subqueries.employees e
 ) ORDER BY personnelType ASC, salary DESC;
-
-
-
-
-
-
-
-
-

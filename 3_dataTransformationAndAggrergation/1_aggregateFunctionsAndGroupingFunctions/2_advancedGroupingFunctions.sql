@@ -153,5 +153,3 @@ NATURAL JOIN data_transformation_and_aggregation.regions
 NATURAL JOIN data_transformation_and_aggregation.products
 GROUP BY CUBE(regionName, category)
 ORDER BY regionName, category;
-
-

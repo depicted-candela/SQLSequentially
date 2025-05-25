@@ -61,6 +61,3 @@ WHERE e1.salary != ALL (										-- in the same set is the same set to be compa
 
 SELECT * FROM complementary.employees WHERE dept_id IN (SELECT dept_id FROM complementary.departments d WHERE d.dept_id IS NOT NULL); -- clearly cleaner
 SELECT * FROM complementary.employees e WHERE EXISTS (SELECT d.dept_id FROM complementary.departments d WHERE d.dept_id IS NOT NULL AND d.dept_id = d.dept_id);
-
-
-

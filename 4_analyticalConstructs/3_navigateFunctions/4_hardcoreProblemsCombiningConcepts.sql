@@ -19,55 +19,55 @@
 -- record using DENSE_RANK(). This rank should appear on all records for that em-
 -- ployee.
 -- Order results by employee name, then metric date.
--- WITH RECURSIVE slicer AS (
--- 	SELECT employee_id, employee_name, metric_date, sales_amount current_sales,
--- 		LAG(sales_amount, 1, 0) OVER(PARTITION BY employee_id ORDER BY metric_date) previous_sales,
--- 		LEAD(sales_amount, 1, 0) OVER(PARTITION BY employee_id ORDER BY metric_date) next_sales
--- 	FROM analytical_cons_navigate_functions.employee_performance
--- 	WHERE department = 'Sales'
--- ), binary_peaks AS (
--- 	SELECT
--- 	    slicer.*,
--- 	    (current_sales > previous_sales) AS is_better
--- 	FROM slicer ORDER BY employee_id, metric_date
--- ), identified_peaks AS (
--- 	SELECT *, ROW_NUMBER() OVER(ORDER BY employee_id, metric_date) - 1 peak_id FROM binary_peaks
--- ), recursive_grouping AS (
--- 	SELECT employee_id, is_better, peak_id, 0 AS streak_group_id
--- 	FROM identified_peaks WHERE peak_id = 0
--- 		UNION ALL
--- 	SELECT ip.employee_id, ip.is_better, ip.peak_id,
--- 		CASE
--- 			WHEN ip.is_better IS TRUE AND rg.is_better IS TRUE THEN rg.streak_group_id
--- 			WHEN ip.is_better IS FALSE AND rg.is_better IS TRUE THEN rg.streak_group_id + 1
--- 			ELSE rg.streak_group_id
--- 		END streak_group_id
--- 	FROM identified_peaks ip
--- 	JOIN recursive_grouping rg ON ip.peak_id = rg.peak_id + 1
--- ), grouped_for_rankings AS (
--- 	SELECT 
--- 		peak_id, employee_id, employee_name, metric_date, 
--- 		current_sales, previous_sales, next_sales, is_better, streak_group_id,
--- 		CASE WHEN is_better IS TRUE THEN streak_group_id ELSE NULL END grouped_peaks
--- 	FROM recursive_grouping NATURAL JOIN identified_peaks
--- ), ranked_peaks AS (
--- 	SELECT *, 
--- 		DENSE_RANK() OVER(PARTITION BY employee_id, grouped_peaks ORDER BY metric_date) peak,
--- 		SUM(current_sales) OVER(PARTITION BY employee_id, grouped_peaks ORDER BY metric_date) cumulative_sales
--- 	FROM grouped_for_rankings 
--- 	WHERE grouped_peaks IS NOT NULL
--- )
--- SELECT 
--- 	g.employee_id, g.employee_name, g.metric_date, g.current_sales,
--- 	g.previous_sales, g.next_sales, g.is_better, r.streak_group_id, cumulative_sales, l.*, 
--- 	DENSE_RANK() OVER(PARTITION BY g.employee_id ORDER BY g.current_sales) sales_rank_overall
--- FROM grouped_for_rankings g 
--- LEFT JOIN ranked_peaks r USING(peak_id), 
--- LATERAL(
--- 	SELECT ROUND(AVG(sales_amount), 2) avg_monthly_sales_for_employee
--- 	FROM analytical_cons_navigate_functions.employee_performance ep
--- 	WHERE ep.employee_id = g.employee_id AND DATE_TRUNC('month', ep.metric_date) = DATE_TRUNC('month', g.metric_date)
--- ) l ORDER BY g.employee_name, g.metric_date;
+ WITH RECURSIVE slicer AS (
+ 	SELECT employee_id, employee_name, metric_date, sales_amount current_sales,
+ 		LAG(sales_amount, 1, 0) OVER(PARTITION BY employee_id ORDER BY metric_date) previous_sales,
+ 		LEAD(sales_amount, 1, 0) OVER(PARTITION BY employee_id ORDER BY metric_date) next_sales
+ 	FROM analytical_cons_navigate_functions.employee_performance
+ 	WHERE department = 'Sales'
+ ), binary_peaks AS (
+ 	SELECT
+ 	    slicer.*,
+ 	    (current_sales > previous_sales) AS is_better
+ 	FROM slicer ORDER BY employee_id, metric_date
+ ), identified_peaks AS (
+ 	SELECT *, ROW_NUMBER() OVER(ORDER BY employee_id, metric_date) - 1 peak_id FROM binary_peaks
+ ), recursive_grouping AS (
+ 	SELECT employee_id, is_better, peak_id, 0 AS streak_group_id
+ 	FROM identified_peaks WHERE peak_id = 0
+ 		UNION ALL
+ 	SELECT ip.employee_id, ip.is_better, ip.peak_id,
+ 		CASE
+ 			WHEN ip.is_better IS TRUE AND rg.is_better IS TRUE THEN rg.streak_group_id
+ 			WHEN ip.is_better IS FALSE AND rg.is_better IS TRUE THEN rg.streak_group_id + 1
+ 			ELSE rg.streak_group_id
+ 		END streak_group_id
+ 	FROM identified_peaks ip
+ 	JOIN recursive_grouping rg ON ip.peak_id = rg.peak_id + 1
+ ), grouped_for_rankings AS (
+ 	SELECT 
+ 		peak_id, employee_id, employee_name, metric_date, 
+ 		current_sales, previous_sales, next_sales, is_better, streak_group_id,
+ 		CASE WHEN is_better IS TRUE THEN streak_group_id ELSE NULL END grouped_peaks
+ 	FROM recursive_grouping NATURAL JOIN identified_peaks
+ ), ranked_peaks AS (
+ 	SELECT *, 
+ 		DENSE_RANK() OVER(PARTITION BY employee_id, grouped_peaks ORDER BY metric_date) peak,
+ 		SUM(current_sales) OVER(PARTITION BY employee_id, grouped_peaks ORDER BY metric_date) cumulative_sales
+ 	FROM grouped_for_rankings 
+ 	WHERE grouped_peaks IS NOT NULL
+ )
+ SELECT 
+ 	g.employee_id, g.employee_name, g.metric_date, g.current_sales,
+ 	g.previous_sales, g.next_sales, g.is_better, r.streak_group_id, cumulative_sales, l.*, 
+ 	DENSE_RANK() OVER(PARTITION BY g.employee_id ORDER BY g.current_sales) sales_rank_overall
+ FROM grouped_for_rankings g 
+ LEFT JOIN ranked_peaks r USING(peak_id), 
+ LATERAL(
+ 	SELECT ROUND(AVG(sales_amount), 2) avg_monthly_sales_for_employee
+ 	FROM analytical_cons_navigate_functions.employee_performance ep
+ 	WHERE ep.employee_id = g.employee_id AND DATE_TRUNC('month', ep.metric_date) = DATE_TRUNC('month', g.metric_date)
+ ) l ORDER BY g.employee_name, g.metric_date;
 
 
 -- 		Exercise 4.2: Departmental Task Performance Analysis
@@ -162,4 +162,3 @@ GROUP BY
     sm.department, sm.employee_id, sm.employee_name
 ORDER BY
     sm.department, sm.employee_name;
-

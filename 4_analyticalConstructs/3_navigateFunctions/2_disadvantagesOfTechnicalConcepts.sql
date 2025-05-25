@@ -38,5 +38,3 @@ FROM analytical_cons_navigate_functions.employee_performance 		-- The result is 
 WHERE employee_name = 'Bob Johnson'					-- an independent space (employee_id) is the same to
 ORDER BY metric_date;								-- an ordering. This leads to two ways to do the same,
 													-- misleading concepts up to confusion
-
-

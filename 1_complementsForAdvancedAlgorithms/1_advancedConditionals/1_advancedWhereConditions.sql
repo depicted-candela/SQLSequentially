@@ -51,10 +51,3 @@ FROM complementary.employees e1
 JOIN complementary.employees e2
 ON e1.emp_id < e2.emp_id
 WHERE e2.manager_id IS NOT DISTINCT FROM e1.manager_id;
-
-
-
-
-
-
-
