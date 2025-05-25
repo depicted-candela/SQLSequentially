@@ -15,7 +15,7 @@ This repository is a testament to a passion for SQL and a commitment to structur
 *   🛠️ **Practical, Hands-On Learning:** Theory is immediately reinforced with custom-designed exercises to solidify your skills.
 *   🐘 **PostgreSQL Focused but Universally Applicable (Oracle SQL, Server SQL, MySQL):** While leveraging the power and advanced features of PostgreSQL, the core concepts learned are transferable to any SQL dialect.
 *   📈 **From Novice to Pro:** A clear path from `BASIC` SQL fundamentals, through `INTERMEDIATE` techniques, to `ADVANCED` query wizardry and `COMPLEMENTARY` deep-dives.
-*   📊 **Real-World Application:** Includes examples of how to visualize data insights using Metabase, connecting SQL power to business intelligence.
+*   📊 **Real-World Application:** Try to visualize data insights using Metabase (Open Source with generous free tiers), connecting SQL power to business intelligence.
 
 ---
 
