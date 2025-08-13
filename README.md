@@ -21,6 +21,7 @@ This repository is a testament to a passion for SQL and a commitment to structur
 
 ### 📚 Course Structure: Your Roadmap to SQL Expertise
 
+Before to start this, be sure to take these tutorials [Basic SQL](https://datalemur.com/sql-tutorial/intro-to-sql) and [Intermediate SQL](https://datalemur.com/sql-tutorial/intermediate-data-science-sql-intro) from DataLemur SQL Tutorial.
 This course is sequentially structured to build your knowledge step-by-step. Each module contains detailed PDF lectures and dedicated exercises.
 
 ---
